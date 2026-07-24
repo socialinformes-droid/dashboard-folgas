@@ -473,9 +473,20 @@ export default function Home() {
                 };
 
                 let item = { id: String(idx + 1) };
+                let dataInicioCol = -1, dataFimCol = -1;
+
+                // Primeiro passe: identificar posições das colunas
+                headers.forEach((h, colIndex) => {
+                    if ((h.includes('início') || h.includes('inicio')) && h.includes('data') && h.includes('de'))
+                        dataInicioCol = colIndex;
+                    else if ((h.includes('fim') || h.includes('até') || h.includes('ate')) && h.includes('data'))
+                        dataFimCol = colIndex;
+                });
+
+                // Segundo passe: mapear dados
                 headers.forEach((h, colIndex) => {
                     const val = String(getVal(colIndex)).trim();
-                    if (!val) return;
+                    if (!val || val === 'null') return;
 
                     if (h.includes('nome') || h.includes('colaborador') || h.includes('pessoa'))
                         item.nome = val;
@@ -483,9 +494,9 @@ export default function Home() {
                         item.departamento = val;
                     else if (h.includes('tipo') || h.includes('informe') || h.includes('motivo'))
                         item.tipo = val;
-                    else if ((h.includes('data') || h.includes('início') || h.includes('inicio') || h.includes('de')) && !h.includes('fim') && !h.includes('até'))
+                    else if (colIndex === dataInicioCol)
                         item.dataInicio = formatDateStr(val);
-                    else if (h.includes('fim') || h.includes('até') || h.includes('ate') || (h.includes('data') && (h.includes('fim') || h.includes('até'))))
+                    else if (colIndex === dataFimCol)
                         item.dataFim = formatDateStr(val);
                     else if (h.includes('status') || h.includes('situação') || h.includes('situacao'))
                         item.status = val;
