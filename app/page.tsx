@@ -391,9 +391,9 @@ export default function Home() {
             if (!dateStr) return '';
             const normalized = String(dateStr).trim();
             // Se já estiver em YYYY-MM-DD, retorna
-            if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return normalized;
+            if (/^\\d{4}-\\d{2}-\\d{2}$/.test(normalized)) return normalized;
             // Se estiver em DD/MM/YYYY, converte
-            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(normalized)) {
+            if (/^\\d{1,2}\\/\\d{1,2}\\/\\d{4}$/.test(normalized)) {
                 const [d, m, y] = normalized.split('/');
                 return \`\${y}-\${String(m).padStart(2,'0')}-\${String(d).padStart(2,'0')}\`;
             }
@@ -419,7 +419,6 @@ export default function Home() {
                     if (jsonMatch && jsonMatch[1]) {
                         const parsed = JSON.parse(jsonMatch[1]);
                         const records = parseGvizRows(parsed.table);
-                        console.log('Gviz parsed records:', records.length, records);
                         if (records.length > 0) {
                             leaveRecords = records;
                             initDashboard();
@@ -463,13 +462,8 @@ export default function Home() {
         }
 
         function parseGvizRows(table) {
-            if (!table || !table.cols || !table.rows) {
-                console.log('Table structure invalid:', { hasCols: !!table?.cols, hasRows: !!table?.rows });
-                return [];
-            }
+            if (!table || !table.cols || !table.rows) return [];
             const headers = table.cols.map(c => c ? (c.label || '').toLowerCase().trim() : '');
-            console.log('Headers:', headers);
-            console.log('Rows count:', table.rows.length);
 
             return table.rows.map((row, idx) => {
                 const getVal = (colIdx) => {
@@ -489,8 +483,6 @@ export default function Home() {
                 item.dataInicio = formatDateStr(getVal(5));  // Col F: Data Início
                 item.dataFim = formatDateStr(getVal(6));  // Col G: Data Fim
                 item.status = getVal(7);  // Col H: Aprovado por gestor?
-
-                console.log('Parsed row', idx, ':', item);
 
                 // Se não tem dataFim, usa dataInicio
                 if (item.dataInicio && !item.dataFim) {
@@ -553,7 +545,6 @@ export default function Home() {
                     const y = match[1];
                     const m = String(parseInt(match[2]) + 1).padStart(2, '0');
                     const d = String(match[3]).padStart(2, '0');
-                    console.log('Parsed date:', str, '→', \`\${y}-\${m}-\${d}\`);
                     return \`\${y}-\${m}-\${d}\`;
                 }
             }
