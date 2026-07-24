@@ -1,22 +1,17 @@
-'use client';
-
-export default function Home() {
-  return (
-    <div dangerouslySetInnerHTML={{
-      __html: `<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="pt-BR" class="h-full bg-slate-50">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Painel de Visualização de Folgas</title>
     <!-- Tailwind CSS -->
-    <script src="https://cdn.tailwindcss.com"><\/script>
+    <script src="https://cdn.tailwindcss.com"></script>
     <!-- Font Awesome -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <!-- Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"><\/script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <!-- PapaParse -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"><\/script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
     <!-- Custom Scrollbar & Utility Styles -->
     <style>
         @import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
@@ -42,7 +37,7 @@ export default function Home() {
                 <!-- Brand Title -->
                 <div class="flex items-center gap-3">
                     <div class="w-10 h-10 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-lg shadow-md shadow-blue-500/20">
-                        <i class="fa-solid fa-calendar-days"><\/i>
+                        <i class="fa-solid fa-calendar-days"></i>
                     </div>
                     <div>
                         <h1 class="text-base font-bold text-slate-900 leading-tight">Escala & Visualização de Folgas</h1>
@@ -53,7 +48,7 @@ export default function Home() {
                 <!-- Actions -->
                 <div class="flex items-center gap-2 sm:gap-3">
                     <a href="https://docs.google.com/forms" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 transition active:scale-95" title="Abrir formulário de solicitação de folga">
-                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"><\/i>
+                        <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                         <span>Nova Folga (Formulário)</span>
                     </a>
                 </div>
@@ -71,19 +66,19 @@ export default function Home() {
                 <!-- View Tabs Switcher -->
                 <div class="flex items-center p-1 bg-slate-100/80 rounded-xl max-w-max border border-slate-200/50">
                     <button onclick="switchView('timeline')" id="btn-view-timeline" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-blue-600 shadow-xs">
-                        <i class="fa-solid fa-chart-gantt"><\/i>
+                        <i class="fa-solid fa-chart-gantt"></i>
                         <span>Linha do Tempo</span>
                     </button>
                     <button onclick="switchView('calendar')" id="btn-view-calendar" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
-                        <i class="fa-regular fa-calendar text-sm"><\/i>
+                        <i class="fa-regular fa-calendar text-sm"></i>
                         <span>Calendário</span>
                     </button>
                     <button onclick="switchView('dashboard')" id="btn-view-dashboard" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
-                        <i class="fa-solid fa-chart-pie"><\/i>
+                        <i class="fa-solid fa-chart-pie"></i>
                         <span>Indicadores</span>
                     </button>
                     <button onclick="switchView('table')" id="btn-view-table" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
-                        <i class="fa-solid fa-list-ul"><\/i>
+                        <i class="fa-solid fa-list-ul"></i>
                         <span>Tabela</span>
                     </button>
                 </div>
@@ -91,13 +86,13 @@ export default function Home() {
                 <!-- Date Range Selector -->
                 <div class="flex items-center gap-2">
                     <button onclick="navigateMonth(-1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition" title="Mês Anterior">
-                        <i class="fa-solid fa-chevron-left text-xs"><\/i>
+                        <i class="fa-solid fa-chevron-left text-xs"></i>
                     </button>
                     <div class="relative min-w-[160px] text-center">
                         <span id="currentPeriodLabel" class="text-sm font-bold text-slate-800">Carregando...</span>
                     </div>
                     <button onclick="navigateMonth(1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition" title="Próximo Mês">
-                        <i class="fa-solid fa-chevron-right text-xs"><\/i>
+                        <i class="fa-solid fa-chevron-right text-xs"></i>
                     </button>
                     <button onclick="resetToCurrentMonth()" class="px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition">
                         Hoje
@@ -111,7 +106,7 @@ export default function Home() {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <!-- Search Input -->
                 <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"><\/i>
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
                     <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Buscar colaborador..." 
                            class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
                 </div>
@@ -140,7 +135,7 @@ export default function Home() {
                 <!-- Clear Filters Button -->
                 <div class="flex items-center">
                     <button onclick="clearFilters()" class="w-full py-2 px-3 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-xl transition flex items-center justify-center gap-1.5">
-                        <i class="fa-solid fa-filter-circle-xmark"><\/i>
+                        <i class="fa-solid fa-filter-circle-xmark"></i>
                         <span>Limpar Filtros</span>
                     </button>
                 </div>
@@ -157,7 +152,7 @@ export default function Home() {
                     <p class="text-[11px] text-slate-400 mt-0.5" id="kpiTotalSub">no período visualizado</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base font-bold">
-                    <i class="fa-solid fa-umbrella-beach"><\/i>
+                    <i class="fa-solid fa-umbrella-beach"></i>
                 </div>
             </div>
 
@@ -169,7 +164,7 @@ export default function Home() {
                     <p class="text-[11px] text-slate-400 mt-0.5">colaboradores de folga</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base font-bold">
-                    <i class="fa-solid fa-user-clock"><\/i>
+                    <i class="fa-solid fa-user-clock"></i>
                 </div>
             </div>
 
@@ -181,7 +176,7 @@ export default function Home() {
                     <p class="text-[11px] text-slate-400 mt-0.5">dias c/ &gt;1 folga no setor</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-rose-50 text-rose-600 flex items-center justify-center text-base font-bold">
-                    <i class="fa-solid fa-triangle-exclamation"><\/i>
+                    <i class="fa-solid fa-triangle-exclamation"></i>
                 </div>
             </div>
 
@@ -193,14 +188,14 @@ export default function Home() {
                     <p class="text-[11px] text-slate-400 mt-0.5" id="kpiTopDeptCount">0 folgas acumuladas</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-indigo-50 text-indigo-600 flex items-center justify-center text-base font-bold">
-                    <i class="fa-solid fa-building-user"><\/i>
+                    <i class="fa-solid fa-building-user"></i>
                 </div>
             </div>
         </div>
 
         <!-- Overlap Alert Banner -->
         <div id="overlapBanner" class="hidden bg-amber-50 border border-amber-200/80 rounded-2xl p-4 flex items-start gap-3 animate-fade-in">
-            <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-base"><\/i>
+            <i class="fa-solid fa-triangle-exclamation text-amber-600 mt-0.5 text-base"></i>
             <div class="flex-1 text-xs text-amber-900">
                 <span class="font-bold">Atenção para Coincidência de Folgas:</span>
                 <span id="overlapMessage">Existem múltiplos colaboradores do mesmo departamento folgando nos mesmos dias. Verifique a Linha do Tempo para organizar a cobertura de turnos.</span>
@@ -218,11 +213,11 @@ export default function Home() {
                     <p class="text-xs text-slate-500">Acompanhe a distribuição diária de folgas por colaborador</p>
                 </div>
                 <div class="flex flex-wrap items-center gap-3 text-xs">
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-blue-500"><\/span> Folga</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"><\/span> Férias</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-purple-500"><\/span> Banco</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500"><\/span> Aniversário</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"><\/span> Atestado</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-blue-500"></span> Folga</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Férias</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-purple-500"></span> Banco</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500"></span> Aniversário</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Atestado</span>
                 </div>
             </div>
 
@@ -259,7 +254,7 @@ export default function Home() {
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
                     <h3 class="text-sm font-bold text-slate-900">Distribuição por Tipo de Ausência</h3>
                     <div class="h-64 relative">
-                        <canvas id="typeChart"><\/canvas>
+                        <canvas id="typeChart"></canvas>
                     </div>
                 </div>
 
@@ -267,7 +262,7 @@ export default function Home() {
                 <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
                     <h3 class="text-sm font-bold text-slate-900">Folgas por Departamento</h3>
                     <div class="h-64 relative">
-                        <canvas id="departmentChart"><\/canvas>
+                        <canvas id="departmentChart"></canvas>
                     </div>
                 </div>
             </div>
@@ -276,7 +271,7 @@ export default function Home() {
             <div class="bg-white p-5 rounded-2xl border border-slate-200/80 shadow-xs space-y-3">
                 <h3 class="text-sm font-bold text-slate-900">Volume de Folgas ao Longo dos Meses</h3>
                 <div class="h-64 relative">
-                    <canvas id="trendChart"><\/canvas>
+                    <canvas id="trendChart"></canvas>
                 </div>
             </div>
         </div>
@@ -289,7 +284,7 @@ export default function Home() {
                     <p class="text-xs text-slate-500">Gerencie todos os registros e exporte relatórios</p>
                 </div>
                 <button onclick="exportToCSV()" class="px-3 py-1.5 text-xs font-semibold rounded-lg bg-emerald-50 text-emerald-700 hover:bg-emerald-100 border border-emerald-200/80 flex items-center gap-1.5 transition">
-                    <i class="fa-solid fa-file-excel"><\/i>
+                    <i class="fa-solid fa-file-excel"></i>
                     <span>Exportar CSV</span>
                 </button>
             </div>
@@ -330,7 +325,7 @@ export default function Home() {
     </div>
 
     <!-- Toast Container -->
-    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"><\/div>
+    <div id="toastContainer" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 pointer-events-none"></div>
 
     <script>
         // Sheet ID from input
@@ -366,14 +361,14 @@ export default function Home() {
         });
 
         async function fetchSheetData() {
-            const gvizUrl = \`https://docs.google.com/spreadsheets/d/\${SHEET_ID}/gviz/tq?tqx=out:json\`;
-            const csvUrl = \`https://docs.google.com/spreadsheets/d/\${SHEET_ID}/export?format=csv\`;
+            const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
+            const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
 
             try {
                 const res = await fetch(gvizUrl);
                 if (res.ok) {
                     const text = await res.text();
-                    const jsonMatch = text.match(/google\\.visualization\\.Query\\.setResponse\\(([\\s\\S]*)\\);/);
+                    const jsonMatch = text.match(/google\.visualization\.Query\.setResponse\(([\s\S]*)\);/);
                     if (jsonMatch && jsonMatch[1]) {
                         const parsed = JSON.parse(jsonMatch[1]);
                         const records = parseGvizRows(parsed.table);
@@ -440,7 +435,7 @@ export default function Home() {
                     else if (h.includes('obs') || h.includes('nota') || h.includes('comentário')) item.obs = String(val);
                 });
 
-                item.nome = item.nome || \`Colaborador \${idx+1}\`;
+                item.nome = item.nome || `Colaborador ${idx+1}`;
                 item.departamento = item.departamento || 'Geral';
                 item.tipo = item.tipo || 'Folga Escala';
                 item.dataInicio = item.dataInicio || '2026-07-01';
@@ -469,7 +464,7 @@ export default function Home() {
                     else if (lk.includes('obs')) item.obs = val;
                 });
 
-                item.nome = item.nome || \`Colaborador \${idx+1}\`;
+                item.nome = item.nome || `Colaborador ${idx+1}`;
                 item.departamento = item.departamento || 'Geral';
                 item.tipo = item.tipo || 'Folga Escala';
                 item.dataInicio = item.dataInicio || '2026-07-01';
@@ -483,18 +478,18 @@ export default function Home() {
             if (!val) return '2026-07-01';
             let str = String(val).trim();
             if (str.includes('Date(')) {
-                const parts = str.match(/\\d+/g);
+                const parts = str.match(/\d+/g);
                 if (parts && parts.length >= 3) {
                     const y = parts[0];
                     const m = String(parseInt(parts[1]) + 1).padStart(2, '0');
                     const d = String(parts[2]).padStart(2, '0');
-                    return \`\${y}-\${m}-\${d}\`;
+                    return `${y}-${m}-${d}`;
                 }
             }
             if (str.includes('/')) {
                 const p = str.split('/');
                 if (p.length === 3 && p[2].length === 4) {
-                    return \`\${p[2]}-\${p[1].padStart(2,'0')}-\${p[0].padStart(2,'0')}\`;
+                    return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
                 }
             }
             return str;
@@ -512,7 +507,7 @@ export default function Home() {
             const depts = [...new Set(leaveRecords.map(r => r.departamento).filter(Boolean))].sort();
             deptSelect.innerHTML = '<option value="ALL">Todos os Setores</option>';
             depts.forEach(d => {
-                deptSelect.innerHTML += \`<option value="\${d}">\${d}</option>\`;
+                deptSelect.innerHTML += `<option value="${d}">${d}</option>`;
             });
             if (depts.includes(currentDept)) deptSelect.value = currentDept;
 
@@ -522,7 +517,7 @@ export default function Home() {
             const types = [...new Set(leaveRecords.map(r => r.tipo).filter(Boolean))].sort();
             typeSelect.innerHTML = '<option value="ALL">Todos os Tipos</option>';
             types.forEach(t => {
-                typeSelect.innerHTML += \`<option value="\${t}">\${t}</option>\`;
+                typeSelect.innerHTML += `<option value="${t}">${t}</option>`;
             });
             if (types.includes(currentType)) typeSelect.value = currentType;
 
@@ -532,7 +527,7 @@ export default function Home() {
             const statuses = [...new Set(leaveRecords.map(r => r.status).filter(Boolean))].sort();
             statusSelect.innerHTML = '<option value="ALL">Todos os Status</option>';
             statuses.forEach(s => {
-                statusSelect.innerHTML += \`<option value="\${s}">\${s}</option>\`;
+                statusSelect.innerHTML += `<option value="${s}">${s}</option>`;
             });
             if (statuses.includes(currentStatus)) statusSelect.value = currentStatus;
         }
@@ -574,13 +569,13 @@ export default function Home() {
                 btn.classList.add('text-slate-600');
             });
 
-            const activeBtn = document.getElementById(\`btn-view-\${viewName}\`);
+            const activeBtn = document.getElementById(`btn-view-${viewName}`);
             if (activeBtn) {
                 activeBtn.classList.add('bg-white', 'text-blue-600', 'shadow-xs');
                 activeBtn.classList.remove('text-slate-600');
             }
 
-            const targetView = document.getElementById(\`view-\${viewName}\`);
+            const targetView = document.getElementById(`view-${viewName}`);
             if (targetView) targetView.classList.remove('hidden');
 
             renderActiveView();
@@ -609,7 +604,7 @@ export default function Home() {
 
         function updateHeaderPeriodLabel() {
             const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            const label = \`\${months[currentDate.getMonth()]} \${currentDate.getFullYear()}\`;
+            const label = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
             document.getElementById('currentPeriodLabel').innerText = label;
         }
 
@@ -633,7 +628,7 @@ export default function Home() {
                 }
             });
             document.getElementById('kpiTopDept').innerText = topDept;
-            document.getElementById('kpiTopDeptCount').innerText = \`\${topCount} ausências registradas\`;
+            document.getElementById('kpiTopDeptCount').innerText = `${topCount} ausências registradas`;
 
             let overlapCount = 0;
             const year = currentDate.getFullYear();
@@ -641,7 +636,7 @@ export default function Home() {
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
             for (let d = 1; d <= daysInMonth; d++) {
-                const dayStr = \`\${year}-\${String(month+1).padStart(2,'0')}-\${String(d).padStart(2,'0')}\`;
+                const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const deptsOnDay = {};
                 filteredRecords.forEach(r => {
                     if (r.dataInicio <= dayStr && r.dataFim >= dayStr) {
@@ -658,7 +653,7 @@ export default function Home() {
             const banner = document.getElementById('overlapBanner');
             if (overlapCount > 0) {
                 banner.classList.remove('hidden');
-                document.getElementById('overlapMessage').innerText = \`Foram identificadas \${overlapCount} ocorrências de 2 ou mais pessoas do mesmo setor de folga juntas no mês de \${document.getElementById('currentPeriodLabel').innerText}.\`;
+                document.getElementById('overlapMessage').innerText = `Foram identificadas ${overlapCount} ocorrências de 2 ou mais pessoas do mesmo setor de folga juntas no mês de ${document.getElementById('currentPeriodLabel').innerText}.`;
             } else {
                 banner.classList.add('hidden');
             }
@@ -673,50 +668,50 @@ export default function Home() {
             const employees = [...new Set(filteredRecords.map(r => r.nome))].sort();
 
             if (employees.length === 0) {
-                container.innerHTML = \`
+                container.innerHTML = `
                     <div class="p-12 text-center text-slate-400 text-xs space-y-2">
-                        <i class="fa-solid fa-folder-open text-3xl text-slate-300"><\/i>
+                        <i class="fa-solid fa-folder-open text-3xl text-slate-300"></i>
                         <p>Nenhum registro encontrado para os filtros selecionados.</p>
-                    </div>\`;
+                    </div>`;
                 return;
             }
 
-            let html = \`<div class="min-w-[950px]">\`;
+            let html = `<div class="min-w-[950px]">`;
 
             // Timeline Header
-            html += \`<div class="flex border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-600 sticky top-0 z-10">\`;
-            html += \`<div class="w-56 p-3 border-r border-slate-200 flex items-center justify-between bg-slate-50">
+            html += `<div class="flex border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-600 sticky top-0 z-10">`;
+            html += `<div class="w-56 p-3 border-r border-slate-200 flex items-center justify-between bg-slate-50">
                         <span>Colaborador / Setor</span>
-                        <span class="text-[10px] font-normal text-slate-400">(\${employees.length})</span>
-                     </div>\`;
-            html += \`<div class="flex-1 flex">\`;
+                        <span class="text-[10px] font-normal text-slate-400">(${employees.length})</span>
+                     </div>`;
+            html += `<div class="flex-1 flex">`;
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dateObj = new Date(year, month, d);
                 const dayOfWeek = dateObj.getDay();
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-                html += \`<div class="flex-1 text-center py-2 border-r border-slate-200 \${isWeekend ? 'bg-slate-100/70 text-slate-400' : ''}>
-                            <div>\${d}</div>
-                            <div class="text-[9px] font-normal uppercase">\${\`DSTQQSS\`.split('')[dayOfWeek]}</div>
-                         </div>\`;
+                html += `<div class="flex-1 text-center py-2 border-r border-slate-200 ${isWeekend ? 'bg-slate-100/70 text-slate-400' : ''}">
+                            <div>${d}</div>
+                            <div class="text-[9px] font-normal uppercase">${['D','S','T','Q','Q','S','S'][dayOfWeek]}</div>
+                         </div>`;
             }
-            html += \`</div></div>\`;
+            html += `</div></div>`;
 
             // Employee Timeline Rows
             employees.forEach(emp => {
                 const empRecords = filteredRecords.filter(r => r.nome === emp);
                 const dept = empRecords[0]?.departamento || '';
 
-                html += \`<div class="flex border-b border-slate-100 hover:bg-slate-50/80 transition text-xs">\`;
-                html += \`<div class="w-56 p-3 border-r border-slate-200 flex flex-col justify-center">
-                            <span class="font-semibold text-slate-800 truncate">\${emp}</span>
-                            <span class="text-[10px] text-slate-400 truncate">\${dept}</span>
-                         </div>\`;
-                html += \`<div class="flex-1 flex relative items-center py-1.5">\`;
+                html += `<div class="flex border-b border-slate-100 hover:bg-slate-50/80 transition text-xs">`;
+                html += `<div class="w-56 p-3 border-r border-slate-200 flex flex-col justify-center">
+                            <span class="font-semibold text-slate-800 truncate">${emp}</span>
+                            <span class="text-[10px] text-slate-400 truncate">${dept}</span>
+                         </div>`;
+                html += `<div class="flex-1 flex relative items-center py-1.5">`;
 
                 for (let d = 1; d <= daysInMonth; d++) {
-                    const dayStr = \`\${year}-\${String(month+1).padStart(2,'0')}-\${String(d).padStart(2,'0')}\`;
+                    const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                     const activeLeave = empRecords.find(r => r.dataInicio <= dayStr && r.dataFim >= dayStr);
                     const isWeekend = new Date(year, month, d).getDay() % 6 === 0;
 
@@ -733,21 +728,21 @@ export default function Home() {
                         };
                         const bgBadge = colorMap[activeLeave.tipo] || 'bg-slate-700 text-white';
 
-                        badgeHtml = \`<div title="\${activeLeave.tipo}: \${activeLeave.dataInicio.split('-').reverse().join('/')} até \${activeLeave.dataFim.split('-').reverse().join('/')} (\${activeLeave.status})" 
-                                          class="w-full h-7 rounded-md \${bgBadge} flex items-center justify-center text-[10px] font-bold shadow-2xs transition hover:opacity-90 cursor-pointer">
-                                        \${activeLeave.tipo.substring(0, 3)}
-                                     </div>\`;
+                        badgeHtml = `<div title="${activeLeave.tipo}: ${activeLeave.dataInicio.split('-').reverse().join('/')} até ${activeLeave.dataFim.split('-').reverse().join('/')} (${activeLeave.status})" 
+                                          class="w-full h-7 rounded-md ${bgBadge} flex items-center justify-center text-[10px] font-bold shadow-2xs transition hover:opacity-90 cursor-pointer">
+                                        ${activeLeave.tipo.substring(0, 3)}
+                                     </div>`;
                     }
 
-                    html += \`<div class="flex-1 px-0.5 border-r border-slate-100 h-full flex items-center justify-center \${bgClass}">
-                                \${badgeHtml}
-                             </div>\`;
+                    html += `<div class="flex-1 px-0.5 border-r border-slate-100 h-full flex items-center justify-center ${bgClass}">
+                                ${badgeHtml}
+                             </div>`;
                 }
 
-                html += \`</div></div>\`;
+                html += `</div></div>`;
             });
 
-            html += \`</div>\`;
+            html += `</div>`;
             container.innerHTML = html;
         }
 
@@ -762,32 +757,32 @@ export default function Home() {
             let html = '';
 
             for (let i = 0; i < firstDayIndex; i++) {
-                html += \`<div class="bg-slate-50/50 p-2 min-h-[100px] border-b border-slate-100"><\/div>\`;
+                html += `<div class="bg-slate-50/50 p-2 min-h-[100px] border-b border-slate-100"></div>`;
             }
 
             for (let d = 1; d <= daysInMonth; d++) {
-                const dayStr = \`\${year}-\${String(month+1).padStart(2,'0')}-\${String(d).padStart(2,'0')}\`;
+                const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const dayLeaves = filteredRecords.filter(r => r.dataInicio <= dayStr && r.dataFim >= dayStr);
                 const isToday = dayStr === new Date().toISOString().split('T')[0];
 
-                html += \`<div onclick="openDayDetailModal('\${dayStr}')" class="p-2 min-h-[100px] border-b border-slate-100 hover:bg-slate-50 transition cursor-pointer flex flex-col justify-between">
+                html += `<div onclick="openDayDetailModal('${dayStr}')" class="p-2 min-h-[100px] border-b border-slate-100 hover:bg-slate-50 transition cursor-pointer flex flex-col justify-between">
                             <div class="flex items-center justify-between">
-                                <span class="text-xs font-bold \${isToday ? 'w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center' : 'text-slate-700'}">\${d}</span>
-                                \${dayLeaves.length > 0 ? \`<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">\${dayLeaves.length} folga\${dayLeaves.length>1?'s':''}</span>\` : ''}
+                                <span class="text-xs font-bold ${isToday ? 'w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center' : 'text-slate-700'}">${d}</span>
+                                ${dayLeaves.length > 0 ? `<span class="text-[10px] font-bold px-1.5 py-0.5 rounded-full bg-blue-100 text-blue-700">${dayLeaves.length} folga${dayLeaves.length>1?'s':''}</span>` : ''}
                             </div>
-                            <div class="mt-2 space-y-1">\`;
+                            <div class="mt-2 space-y-1">`;
 
                 dayLeaves.slice(0, 3).forEach(l => {
-                    html += \`<div class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-medium truncate" title="\${l.nome} (\${l.tipo})">
-                                \${l.nome.split(' ')[0]} - \${l.tipo}
-                             </div>\`;
+                    html += `<div class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-medium truncate" title="${l.nome} (${l.tipo})">
+                                ${l.nome.split(' ')[0]} - ${l.tipo}
+                             </div>`;
                 });
 
                 if (dayLeaves.length > 3) {
-                    html += \`<div class="text-[9px] text-slate-400 font-semibold text-center">+\${dayLeaves.length - 3} mais</div>\`;
+                    html += `<div class="text-[9px] text-slate-400 font-semibold text-center">+${dayLeaves.length - 3} mais</div>`;
                 }
 
-                html += \`</div></div>\`;
+                html += `</div></div>`;
             }
 
             grid.innerHTML = html;
@@ -799,20 +794,20 @@ export default function Home() {
             const title = document.getElementById('dayDetailTitle');
             const container = document.getElementById('dayDetailList');
 
-            title.innerText = \`Ausências em \${dayStr.split('-').reverse().join('/')}\`;
+            title.innerText = `Ausências em ${dayStr.split('-').reverse().join('/')}`;
 
             if (list.length === 0) {
-                container.innerHTML = \`<p class="text-xs text-slate-400 text-center py-6">Nenhum colaborador de folga nesta data.</p>\`;
+                container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Nenhum colaborador de folga nesta data.</p>`;
             } else {
                 let html = '';
                 list.forEach(item => {
-                    html += \`<div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center justify-between">
+                    html += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center justify-between">
                                 <div>
-                                    <h4 class="text-xs font-bold text-slate-800">\${item.nome}</h4>
-                                    <p class="text-[11px] text-slate-500">\${item.departamento} • \${item.tipo}</p>
+                                    <h4 class="text-xs font-bold text-slate-800">${item.nome}</h4>
+                                    <p class="text-[11px] text-slate-500">${item.departamento} • ${item.tipo}</p>
                                 </div>
-                                <span class="px-2 py-1 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700">\${item.status}</span>
-                             </div>\`;
+                                <span class="px-2 py-1 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700">${item.status}</span>
+                             </div>`;
                 });
                 container.innerHTML = html;
             }
@@ -904,7 +899,7 @@ export default function Home() {
             const tbody = document.getElementById('tableBody');
             
             if (filteredRecords.length === 0) {
-                tbody.innerHTML = \`<tr><td colspan="7" class="text-center py-8 text-slate-400">Nenhum registro encontrado.</td></tr>\`;
+                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400">Nenhum registro encontrado.</td></tr>`;
                 return;
             }
 
@@ -912,19 +907,19 @@ export default function Home() {
             filteredRecords.forEach(r => {
                 const days = calculateDays(r.dataInicio, r.dataFim);
                 
-                html += \`<tr class="hover:bg-slate-50/80 transition">
-                    <td class="py-3 px-4 font-semibold text-slate-800">\${r.nome}</td>
-                    <td class="py-3 px-4">\${r.departamento}</td>
-                    <td class="py-3 px-4"><span class="px-2 py-1 rounded-md bg-slate-100 font-medium">\${r.tipo}</span></td>
-                    <td class="py-3 px-4">\${r.dataInicio.split('-').reverse().join('/')} até \${r.dataFim.split('-').reverse().join('/')}</td>
-                    <td class="py-3 px-4 font-bold text-slate-700">\${days} dia\${days>1?'s':''}</td>
+                html += `<tr class="hover:bg-slate-50/80 transition">
+                    <td class="py-3 px-4 font-semibold text-slate-800">${r.nome}</td>
+                    <td class="py-3 px-4">${r.departamento}</td>
+                    <td class="py-3 px-4"><span class="px-2 py-1 rounded-md bg-slate-100 font-medium">${r.tipo}</span></td>
+                    <td class="py-3 px-4">${r.dataInicio.split('-').reverse().join('/')} até ${r.dataFim.split('-').reverse().join('/')}</td>
+                    <td class="py-3 px-4 font-bold text-slate-700">${days} dia${days>1?'s':''}</td>
                     <td class="py-3 px-4">
-                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] \${r.status==='Aprovado'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">
-                            \${r.status}
+                        <span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${r.status==='Aprovado'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">
+                            ${r.status}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-slate-500 max-w-xs truncate">\${r.obs || '-'}</td>
-                </tr>\`;
+                    <td class="py-3 px-4 text-slate-500 max-w-xs truncate">${r.obs || '-'}</td>
+                </tr>`;
             });
 
             tbody.innerHTML = html;
@@ -939,16 +934,16 @@ export default function Home() {
         }
 
         function exportToCSV() {
-            let csv = 'Nome,Departamento,Tipo,DataInicio,DataFim,Status,Observacoes\\n';
+            let csv = 'Nome,Departamento,Tipo,DataInicio,DataFim,Status,Observacoes\n';
             filteredRecords.forEach(r => {
-                csv += \`"\${r.nome}","\${r.departamento}","\${r.tipo}","\${r.dataInicio}","\${r.dataFim}","\${r.status}","\${r.obs||''}"\n\`;
+                csv += `"${r.nome}","${r.departamento}","${r.tipo}","${r.dataInicio}","${r.dataFim}","${r.status}","${r.obs||''}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
             const url = URL.createObjectURL(blob);
             const a = document.createElement('a');
             a.href = url;
-            a.download = \`relatorio_folgas_\${new Date().toISOString().split('T')[0]}.csv\`;
+            a.download = `relatorio_folgas_${new Date().toISOString().split('T')[0]}.csv`;
             a.click();
             showToast('Relatório CSV gerado com sucesso!', 'success');
         }
@@ -958,15 +953,12 @@ export default function Home() {
             const toast = document.createElement('div');
             
             const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-800';
-            toast.className = \`\${bg} text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 animate-fade-in pointer-events-auto\`;
-            toast.innerHTML = \`<i class="fa-solid fa-circle-info"><\/i> <span>\${message}</span>\`;
+            toast.className = `${bg} text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 animate-fade-in pointer-events-auto`;
+            toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${message}</span>`;
 
             container.appendChild(toast);
             setTimeout(() => toast.remove(), 3500);
         }
-    <\/script>
+    </script>
 </body>
-</html>`
-    }} />
-  );
-}
+</html>
