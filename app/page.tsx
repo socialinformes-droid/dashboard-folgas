@@ -122,28 +122,28 @@ export default function Home() {
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <!-- Search Input -->
                 <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"><\/i>
-                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Buscar colaborador..." 
-                           class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-xs"><\/i>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Buscar colaborador..."
+                           class="w-full pl-9 pr-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition placeholder:text-slate-500">
                 </div>
 
                 <!-- Department Filter (Dynamic) -->
                 <div>
-                    <select id="departmentFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <select id="departmentFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
                         <option value="ALL">Todos os Setores</option>
                     </select>
                 </div>
 
                 <!-- Type Filter (Dynamic) -->
                 <div>
-                    <select id="typeFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <select id="typeFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
                         <option value="ALL">Todos os Tipos</option>
                     </select>
                 </div>
 
                 <!-- Status Filter (Dynamic) -->
                 <div>
-                    <select id="statusFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <select id="statusFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
                         <option value="ALL">Todos os Status</option>
                     </select>
                 </div>
@@ -385,6 +385,26 @@ export default function Home() {
                 btn.disabled = false;
                 btn.innerHTML = '<i class="fa-solid fa-rotate-right text-xs"><\/i> <span>Atualizar</span>';
             }, 2000);
+        }
+
+        function dateToComparable(dateStr) {
+            if (!dateStr) return '';
+            const normalized = String(dateStr).trim();
+            // Se já estiver em YYYY-MM-DD, retorna
+            if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return normalized;
+            // Se estiver em DD/MM/YYYY, converte
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(normalized)) {
+                const [d, m, y] = normalized.split('/');
+                return \`\${y}-\${String(m).padStart(2,'0')}-\${String(d).padStart(2,'0')}\`;
+            }
+            return normalized;
+        }
+
+        function isDateInRange(dayStr, startDate, endDate) {
+            const day = dateToComparable(dayStr);
+            const start = dateToComparable(startDate);
+            const end = dateToComparable(endDate);
+            return day >= start && day <= end;
         }
 
         async function fetchSheetData() {
@@ -703,13 +723,13 @@ export default function Home() {
                 return;
             }
 
-            let html = \`<div class="min-w-[950px]">\`;
+            let html = \`<div class="min-w-[950px] border border-slate-200 rounded-lg overflow-hidden">\`;
 
             // Timeline Header
-            html += \`<div class="flex border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-600 sticky top-0 z-10">\`;
-            html += \`<div class="w-56 p-3 border-r border-slate-200 flex items-center justify-between bg-slate-50">
+            html += \`<div class="flex border-b border-slate-200 bg-slate-100 text-[11px] font-bold text-slate-700 sticky top-0 z-10">\`;
+            html += \`<div class="w-56 p-3 border-r border-slate-200 flex items-center justify-between bg-slate-100">
                         <span>Colaborador / Setor</span>
-                        <span class="text-[10px] font-normal text-slate-400">(\${employees.length})</span>
+                        <span class="text-[10px] font-normal text-slate-500">(\${employees.length})</span>
                      </div>\`;
             html += \`<div class="flex-1 flex">\`;
 
@@ -718,9 +738,9 @@ export default function Home() {
                 const dayOfWeek = dateObj.getDay();
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-                html += \`<div class="flex-1 text-center py-2 border-r border-slate-200 \${isWeekend ? 'bg-slate-100/70 text-slate-400' : ''}>
-                            <div>\${d}</div>
-                            <div class="text-[9px] font-normal uppercase">\${['D','S','T','Q','Q','S','S'][dayOfWeek]}</div>
+                html += \`<div class="flex-1 text-center py-3 border-r border-slate-200 \${isWeekend ? 'bg-slate-200/50 text-slate-600' : 'bg-slate-50'}>
+                            <div class="font-bold">\${d}</div>
+                            <div class="text-[9px] font-semibold uppercase">\${['D','S','T','Q','Q','S','S'][dayOfWeek]}</div>
                          </div>\`;
             }
             html += \`</div></div>\`;
@@ -730,16 +750,16 @@ export default function Home() {
                 const empRecords = filteredRecords.filter(r => r.nome === emp);
                 const dept = empRecords[0]?.departamento || '';
 
-                html += \`<div class="flex border-b border-slate-100 hover:bg-slate-50/80 transition text-xs">\`;
-                html += \`<div class="w-56 p-3 border-r border-slate-200 flex flex-col justify-center">
-                            <span class="font-semibold text-slate-800 truncate">\${emp}</span>
-                            <span class="text-[10px] text-slate-400 truncate">\${dept}</span>
+                html += \`<div class="flex border-b border-slate-100 hover:bg-blue-50/50 transition text-xs">\`;
+                html += \`<div class="w-56 p-3 border-r border-slate-200 flex flex-col justify-center bg-slate-50">
+                            <span class="font-bold text-slate-900 truncate">\${emp}</span>
+                            <span class="text-[10px] text-slate-600 truncate">\${dept}</span>
                          </div>\`;
-                html += \`<div class="flex-1 flex relative items-center py-1.5">\`;
+                html += \`<div class="flex-1 flex relative items-center py-2">\`;
 
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dayStr = \`\${year}-\${String(month+1).padStart(2,'0')}-\${String(d).padStart(2,'0')}\`;
-                    const activeLeave = empRecords.find(r => r.dataInicio <= dayStr && r.dataFim >= dayStr);
+                    const activeLeave = empRecords.find(r => isDateInRange(dayStr, r.dataInicio, r.dataFim));
                     const isWeekend = new Date(year, month, d).getDay() % 6 === 0;
 
                     let bgClass = isWeekend ? 'bg-slate-50/60' : '';
@@ -747,21 +767,21 @@ export default function Home() {
 
                     if (activeLeave) {
                         const colorMap = {
-                            'Folga Escala': 'bg-blue-500 text-white',
-                            'Férias': 'bg-emerald-500 text-white',
-                            'Banco de Horas': 'bg-purple-500 text-white',
-                            'Folga Aniversário': 'bg-amber-500 text-white',
-                            'Atestado': 'bg-rose-500 text-white'
+                            'Folga Escala': 'bg-blue-600 text-white hover:bg-blue-700',
+                            'Férias': 'bg-emerald-600 text-white hover:bg-emerald-700',
+                            'Banco de Horas': 'bg-purple-600 text-white hover:bg-purple-700',
+                            'Folga Aniversário': 'bg-amber-600 text-white hover:bg-amber-700',
+                            'Atestado': 'bg-rose-600 text-white hover:bg-rose-700'
                         };
-                        const bgBadge = colorMap[activeLeave.tipo] || 'bg-slate-700 text-white';
+                        const bgBadge = colorMap[activeLeave.tipo] || 'bg-slate-700 text-white hover:bg-slate-800';
 
-                        badgeHtml = \`<div title="\${activeLeave.tipo}: \${activeLeave.dataInicio.split('-').reverse().join('/')} até \${activeLeave.dataFim.split('-').reverse().join('/')} (\${activeLeave.status})" 
-                                          class="w-full h-7 rounded-md \${bgBadge} flex items-center justify-center text-[10px] font-bold shadow-2xs transition hover:opacity-90 cursor-pointer">
+                        badgeHtml = \`<div title="\${activeLeave.tipo}: \${dateToComparable(activeLeave.dataInicio).split('-').reverse().join('/')} até \${dateToComparable(activeLeave.dataFim).split('-').reverse().join('/')} (\${activeLeave.status})"
+                                          class="w-full h-8 rounded-md \${bgBadge} flex items-center justify-center text-[10px] font-bold shadow-sm transition cursor-pointer">
                                         \${activeLeave.tipo.substring(0, 3)}
                                      </div>\`;
                     }
 
-                    html += \`<div class="flex-1 px-0.5 border-r border-slate-100 h-full flex items-center justify-center \${bgClass}">
+                    html += \`<div class="flex-1 px-1 border-r border-slate-200 h-full flex items-center justify-center \${bgClass}">
                                 \${badgeHtml}
                              </div>\`;
                 }
