@@ -18,14 +18,21 @@
         body { font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         .gantt-cell { min-width: 38px; max-width: 38px; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin { animation: spin 1s linear infinite; }
+        p { color: #334155; }
+        h2, h3, h4 { color: #1e293b; }
     </style>
 </head>
 <body class="h-full flex flex-col text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
@@ -47,7 +54,7 @@
 
                 <!-- Actions -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <a href="https://docs.google.com/forms" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 transition active:scale-95" title="Abrir formulário de solicitação de folga">
+                    <a href="https://forms.gle/dGinxqEvwbxCwUvW8" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 transition active:scale-95" title="Abrir formulário de solicitação de folga">
                         <i class="fa-solid fa-arrow-up-right-from-square text-xs"></i>
                         <span>Nova Folga (Formulário)</span>
                     </a>
@@ -62,7 +69,7 @@
         <!-- Controls Toolbar -->
         <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs space-y-4">
             <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
-                
+
                 <!-- View Tabs Switcher -->
                 <div class="flex items-center p-1 bg-slate-100/80 rounded-xl max-w-max border border-slate-200/50">
                     <button onclick="switchView('timeline')" id="btn-view-timeline" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-blue-600 shadow-xs">
@@ -97,6 +104,10 @@
                     <button onclick="resetToCurrentMonth()" class="px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition">
                         Hoje
                     </button>
+                    <button onclick="refreshData()" id="refreshBtn" class="px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-right text-xs"></i>
+                        <span>Atualizar</span>
+                    </button>
                 </div>
             </div>
 
@@ -106,28 +117,28 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3">
                 <!-- Search Input -->
                 <div class="relative">
-                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-400 text-xs"></i>
-                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Buscar colaborador..." 
-                           class="w-full pl-9 pr-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <i class="fa-solid fa-magnifying-glass absolute left-3 top-1/2 -translate-y-1/2 text-slate-600 text-xs"></i>
+                    <input type="text" id="searchInput" oninput="applyFilters()" placeholder="Buscar colaborador..."
+                           class="w-full pl-9 pr-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition placeholder:text-slate-500">
                 </div>
 
                 <!-- Department Filter (Dynamic) -->
                 <div>
-                    <select id="departmentFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <select id="departmentFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
                         <option value="ALL">Todos os Setores</option>
                     </select>
                 </div>
 
                 <!-- Type Filter (Dynamic) -->
                 <div>
-                    <select id="typeFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <select id="typeFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
                         <option value="ALL">Todos os Tipos</option>
                     </select>
                 </div>
 
                 <!-- Status Filter (Dynamic) -->
                 <div>
-                    <select id="statusFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs bg-slate-50 border border-slate-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/20 focus:border-blue-500 transition">
+                    <select id="statusFilter" onchange="applyFilters()" class="w-full px-3 py-2 text-xs text-slate-900 bg-white border border-slate-300 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500/30 focus:border-blue-500 transition">
                         <option value="ALL">Todos os Status</option>
                     </select>
                 </div>
@@ -147,9 +158,9 @@
             <!-- Total Folgas Card -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
                 <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Registros</p>
-                    <h3 class="text-2xl font-bold text-slate-900 mt-0.5" id="kpiTotal">0</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5" id="kpiTotalSub">no período visualizado</p>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Registros</p>
+                    <h3 class="text-3xl font-bold text-slate-900 mt-0.5" id="kpiTotal">0</h3>
+                    <p class="text-[11px] text-slate-600 mt-0.5" id="kpiTotalSub">no período visualizado</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base font-bold">
                     <i class="fa-solid fa-umbrella-beach"></i>
@@ -159,9 +170,9 @@
             <!-- Ausentes Hoje Card -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
                 <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ausentes Hoje</p>
-                    <h3 class="text-2xl font-bold text-amber-600 mt-0.5" id="kpiTodayOff">0</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">colaboradores de folga</p>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ausentes Hoje</p>
+                    <h3 class="text-3xl font-bold text-amber-600 mt-0.5" id="kpiTodayOff">0</h3>
+                    <p class="text-[11px] text-slate-600 mt-0.5">colaboradores de folga</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base font-bold">
                     <i class="fa-solid fa-user-clock"></i>
@@ -360,6 +371,37 @@
             fetchSheetData();
         });
 
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner text-xs animate-spin"></i> <span>Atualizando...</span>';
+            fetchSheetData();
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-rotate-right text-xs"></i> <span>Atualizar</span>';
+            }, 2000);
+        }
+
+        function dateToComparable(dateStr) {
+            if (!dateStr) return '';
+            const normalized = String(dateStr).trim();
+            // Se já estiver em YYYY-MM-DD, retorna
+            if (/^\d{4}-\d{2}-\d{2}$/.test(normalized)) return normalized;
+            // Se estiver em DD/MM/YYYY, converte
+            if (/^\d{1,2}\/\d{1,2}\/\d{4}$/.test(normalized)) {
+                const [d, m, y] = normalized.split('/');
+                return `${y}-${String(m).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+            }
+            return normalized;
+        }
+
+        function isDateInRange(dayStr, startDate, endDate) {
+            const day = dateToComparable(dayStr);
+            const start = dateToComparable(startDate);
+            const end = dateToComparable(endDate);
+            return day >= start && day <= end;
+        }
+
         async function fetchSheetData() {
             const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
             const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
@@ -411,37 +453,49 @@
         function fallbackToSampleData() {
             leaveRecords = [...SAMPLE_DATA];
             initDashboard();
+            showToast('⚠️ Usando dados de exemplo. Verifique as permissões da Google Sheet.', 'info');
         }
 
         function parseGvizRows(table) {
             if (!table || !table.cols || !table.rows) return [];
-            const headers = table.cols.map(c => c ? (c.label || '').toLowerCase().trim() : '');
 
             return table.rows.map((row, idx) => {
                 const getVal = (colIdx) => {
                     if (!row.c || !row.c[colIdx]) return '';
-                    return row.c[colIdx].v !== null && row.c[colIdx].v !== undefined ? row.c[colIdx].v : (row.c[colIdx].f || '');
+                    const cell = row.c[colIdx];
+                    if (!cell) return '';
+                    const value = cell.v !== null && cell.v !== undefined ? String(cell.v) : (cell.f || '');
+                    return value;
                 };
 
                 let item = { id: String(idx + 1) };
-                headers.forEach((h, colIndex) => {
-                    const val = getVal(colIndex);
-                    if (h.includes('colaborador') || h.includes('nome') || h.includes('pessoa')) item.nome = String(val);
-                    else if (h.includes('departamento') || h.includes('setor') || h.includes('área')) item.departamento = String(val);
-                    else if (h.includes('tipo') || h.includes('motivo')) item.tipo = String(val);
-                    else if (h.includes('início') || h.includes('inicio') || h.includes('de')) item.dataInicio = formatDateStr(val);
-                    else if (h.includes('fim') || h.includes('até') || h.includes('ate')) item.dataFim = formatDateStr(val);
-                    else if (h.includes('status') || h.includes('situação')) item.status = String(val);
-                    else if (h.includes('obs') || h.includes('nota') || h.includes('comentário')) item.obs = String(val);
-                });
 
-                item.nome = item.nome || `Colaborador ${idx+1}`;
-                item.departamento = item.departamento || 'Geral';
-                item.tipo = item.tipo || 'Folga Escala';
-                item.dataInicio = item.dataInicio || '2026-07-01';
-                item.dataFim = item.dataFim || item.dataInicio;
-                item.status = item.status || 'Aprovado';
-                item.obs = item.obs || '';
+                // Mapear colunas pela posição fixa da planilha:
+                // A=Carimbo, B=Nome, C=Área, D=Tipo, E=Data de folga, F=Data início, G=Data fim, H=Aprovado
+                item.nome = getVal(1);
+                item.departamento = getVal(2);
+                item.tipo = getVal(3);
+                item.dataInicio = formatDateStr(getVal(5));
+                item.dataFim = formatDateStr(getVal(6));
+                item.status = getVal(7);
+
+                // Se não tem dataFim, usa dataInicio
+                if (item.dataInicio && !item.dataFim) {
+                    item.dataFim = item.dataInicio;
+                }
+
+                if (!item.nome) item.nome = `Colaborador ${idx+1}`;
+                if (!item.departamento) item.departamento = 'Geral';
+                if (!item.tipo) item.tipo = 'Folga';
+                if (!item.dataInicio) item.dataInicio = '2026-07-01';
+                if (!item.dataFim) item.dataFim = item.dataInicio;
+                if (!item.status) item.status = 'Aprovado';
+                if (!item.obs) item.obs = '';
+
+                item.nome = item.nome.trim();
+                item.departamento = item.departamento.trim();
+                item.tipo = item.tipo.trim();
+                item.status = item.status.trim();
 
                 return item;
             });
@@ -456,11 +510,11 @@
                     const lk = k.toLowerCase().trim();
                     const val = r[k];
                     if (lk.includes('colaborador') || lk.includes('nome')) item.nome = val;
-                    else if (lk.includes('departamento') || lk.includes('setor')) item.departamento = val;
+                    else if (lk.includes('área') || lk.includes('area') || lk.includes('departamento') || lk.includes('setor')) item.departamento = val;
                     else if (lk.includes('tipo')) item.tipo = val;
+                    else if (lk.includes('término') || lk.includes('fim')) item.dataFim = formatDateStr(val);
                     else if (lk.includes('início') || lk.includes('inicio')) item.dataInicio = formatDateStr(val);
-                    else if (lk.includes('fim')) item.dataFim = formatDateStr(val);
-                    else if (lk.includes('status')) item.status = val;
+                    else if (lk.includes('status') || lk.includes('aprovado')) item.status = val;
                     else if (lk.includes('obs')) item.obs = val;
                 });
 
@@ -478,11 +532,13 @@
             if (!val) return '2026-07-01';
             let str = String(val).trim();
             if (str.includes('Date(')) {
-                const parts = str.match(/\d+/g);
-                if (parts && parts.length >= 3) {
-                    const y = parts[0];
-                    const m = String(parseInt(parts[1]) + 1).padStart(2, '0');
-                    const d = String(parts[2]).padStart(2, '0');
+                // Extract numbers from Date(2026,6,20) format
+                const dateRegex = /Date\((\d+),(\d+),(\d+)/;
+                const match = str.match(dateRegex);
+                if (match && match.length >= 4) {
+                    const y = match[1];
+                    const m = String(parseInt(match[2]) + 1).padStart(2, '0');
+                    const d = String(match[3]).padStart(2, '0');
                     return `${y}-${m}-${d}`;
                 }
             }
@@ -539,7 +595,7 @@
             const status = document.getElementById('statusFilter').value;
 
             filteredRecords = leaveRecords.filter(r => {
-                const matchesSearch = (r.nome || '').toLowerCase().includes(search) || 
+                const matchesSearch = (r.nome || '').toLowerCase().includes(search) ||
                                       (r.obs || '').toLowerCase().includes(search);
                 const matchesDept = dept === 'ALL' || r.departamento === dept;
                 const matchesType = type === 'ALL' || r.tipo === type;
@@ -612,7 +668,7 @@
             document.getElementById('kpiTotal').innerText = filteredRecords.length;
 
             const todayStr = new Date().toISOString().split('T')[0];
-            const todayOffCount = filteredRecords.filter(r => r.dataInicio <= todayStr && r.dataFim >= todayStr).length;
+            const todayOffCount = filteredRecords.filter(r => isDateInRange(todayStr, r.dataInicio, r.dataFim)).length;
             document.getElementById('kpiTodayOff').innerText = todayOffCount;
 
             const deptCounts = {};
@@ -639,7 +695,7 @@
                 const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
                 const deptsOnDay = {};
                 filteredRecords.forEach(r => {
-                    if (r.dataInicio <= dayStr && r.dataFim >= dayStr) {
+                    if (isDateInRange(dayStr, r.dataInicio, r.dataFim)) {
                         deptsOnDay[r.departamento] = (deptsOnDay[r.departamento] || 0) + 1;
                     }
                 });
@@ -676,13 +732,13 @@
                 return;
             }
 
-            let html = `<div class="min-w-[950px]">`;
+            let html = `<div class="min-w-[950px] border border-slate-200 rounded-lg overflow-hidden">`;
 
             // Timeline Header
-            html += `<div class="flex border-b border-slate-200 bg-slate-50 text-[11px] font-bold text-slate-600 sticky top-0 z-10">`;
-            html += `<div class="w-56 p-3 border-r border-slate-200 flex items-center justify-between bg-slate-50">
+            html += `<div class="flex border-b border-slate-200 bg-slate-100 text-[11px] font-bold text-slate-700 sticky top-0 z-10">`;
+            html += `<div class="w-56 p-3 border-r border-slate-200 flex items-center justify-between bg-slate-100">
                         <span>Colaborador / Setor</span>
-                        <span class="text-[10px] font-normal text-slate-400">(${employees.length})</span>
+                        <span class="text-[10px] font-normal text-slate-500">(${employees.length})</span>
                      </div>`;
             html += `<div class="flex-1 flex">`;
 
@@ -691,9 +747,9 @@
                 const dayOfWeek = dateObj.getDay();
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
 
-                html += `<div class="flex-1 text-center py-2 border-r border-slate-200 ${isWeekend ? 'bg-slate-100/70 text-slate-400' : ''}">
-                            <div>${d}</div>
-                            <div class="text-[9px] font-normal uppercase">${['D','S','T','Q','Q','S','S'][dayOfWeek]}</div>
+                html += `<div class="flex-1 text-center py-3 border-r border-slate-200 ${isWeekend ? 'bg-slate-200/50 text-slate-600' : 'bg-slate-50'}">
+                            <div class="font-bold">${d}</div>
+                            <div class="text-[9px] font-semibold uppercase">${['D','S','T','Q','Q','S','S'][dayOfWeek]}</div>
                          </div>`;
             }
             html += `</div></div>`;
@@ -703,16 +759,16 @@
                 const empRecords = filteredRecords.filter(r => r.nome === emp);
                 const dept = empRecords[0]?.departamento || '';
 
-                html += `<div class="flex border-b border-slate-100 hover:bg-slate-50/80 transition text-xs">`;
-                html += `<div class="w-56 p-3 border-r border-slate-200 flex flex-col justify-center">
-                            <span class="font-semibold text-slate-800 truncate">${emp}</span>
-                            <span class="text-[10px] text-slate-400 truncate">${dept}</span>
+                html += `<div class="flex border-b border-slate-100 hover:bg-blue-50/50 transition text-xs">`;
+                html += `<div class="w-56 p-3 border-r border-slate-200 flex flex-col justify-center bg-slate-50">
+                            <span class="font-bold text-slate-900 truncate">${emp}</span>
+                            <span class="text-[10px] text-slate-600 truncate">${dept}</span>
                          </div>`;
-                html += `<div class="flex-1 flex relative items-center py-1.5">`;
+                html += `<div class="flex-1 flex relative items-center py-2">`;
 
                 for (let d = 1; d <= daysInMonth; d++) {
                     const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                    const activeLeave = empRecords.find(r => r.dataInicio <= dayStr && r.dataFim >= dayStr);
+                    const activeLeave = empRecords.find(r => isDateInRange(dayStr, r.dataInicio, r.dataFim));
                     const isWeekend = new Date(year, month, d).getDay() % 6 === 0;
 
                     let bgClass = isWeekend ? 'bg-slate-50/60' : '';
@@ -720,21 +776,21 @@
 
                     if (activeLeave) {
                         const colorMap = {
-                            'Folga Escala': 'bg-blue-500 text-white',
-                            'Férias': 'bg-emerald-500 text-white',
-                            'Banco de Horas': 'bg-purple-500 text-white',
-                            'Folga Aniversário': 'bg-amber-500 text-white',
-                            'Atestado': 'bg-rose-500 text-white'
+                            'Folga Escala': 'bg-blue-600 text-white hover:bg-blue-700',
+                            'Férias': 'bg-emerald-600 text-white hover:bg-emerald-700',
+                            'Banco de Horas': 'bg-purple-600 text-white hover:bg-purple-700',
+                            'Folga Aniversário': 'bg-amber-600 text-white hover:bg-amber-700',
+                            'Atestado': 'bg-rose-600 text-white hover:bg-rose-700'
                         };
-                        const bgBadge = colorMap[activeLeave.tipo] || 'bg-slate-700 text-white';
+                        const bgBadge = colorMap[activeLeave.tipo] || 'bg-slate-700 text-white hover:bg-slate-800';
 
-                        badgeHtml = `<div title="${activeLeave.tipo}: ${activeLeave.dataInicio.split('-').reverse().join('/')} até ${activeLeave.dataFim.split('-').reverse().join('/')} (${activeLeave.status})" 
-                                          class="w-full h-7 rounded-md ${bgBadge} flex items-center justify-center text-[10px] font-bold shadow-2xs transition hover:opacity-90 cursor-pointer">
+                        badgeHtml = `<div title="${activeLeave.tipo}: ${dateToComparable(activeLeave.dataInicio).split('-').reverse().join('/')} até ${dateToComparable(activeLeave.dataFim).split('-').reverse().join('/')} (${activeLeave.status})"
+                                          class="w-full h-8 rounded-md ${bgBadge} flex items-center justify-center text-[10px] font-bold shadow-sm transition cursor-pointer">
                                         ${activeLeave.tipo.substring(0, 3)}
                                      </div>`;
                     }
 
-                    html += `<div class="flex-1 px-0.5 border-r border-slate-100 h-full flex items-center justify-center ${bgClass}">
+                    html += `<div class="flex-1 px-1 border-r border-slate-200 h-full flex items-center justify-center ${bgClass}">
                                 ${badgeHtml}
                              </div>`;
                 }
@@ -762,7 +818,7 @@
 
             for (let d = 1; d <= daysInMonth; d++) {
                 const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                const dayLeaves = filteredRecords.filter(r => r.dataInicio <= dayStr && r.dataFim >= dayStr);
+                const dayLeaves = filteredRecords.filter(r => isDateInRange(dayStr, r.dataInicio, r.dataFim));
                 const isToday = dayStr === new Date().toISOString().split('T')[0];
 
                 html += `<div onclick="openDayDetailModal('${dayStr}')" class="p-2 min-h-[100px] border-b border-slate-100 hover:bg-slate-50 transition cursor-pointer flex flex-col justify-between">
@@ -789,7 +845,7 @@
         }
 
         function openDayDetailModal(dayStr) {
-            const list = filteredRecords.filter(r => r.dataInicio <= dayStr && r.dataFim >= dayStr);
+            const list = filteredRecords.filter(r => isDateInRange(dayStr, r.dataInicio, r.dataFim));
             const modal = document.getElementById('dayDetailModal');
             const title = document.getElementById('dayDetailTitle');
             const container = document.getElementById('dayDetailList');
@@ -897,7 +953,7 @@
 
         function renderTable() {
             const tbody = document.getElementById('tableBody');
-            
+
             if (filteredRecords.length === 0) {
                 tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400">Nenhum registro encontrado.</td></tr>`;
                 return;
@@ -906,7 +962,7 @@
             let html = '';
             filteredRecords.forEach(r => {
                 const days = calculateDays(r.dataInicio, r.dataFim);
-                
+
                 html += `<tr class="hover:bg-slate-50/80 transition">
                     <td class="py-3 px-4 font-semibold text-slate-800">${r.nome}</td>
                     <td class="py-3 px-4">${r.departamento}</td>
@@ -951,7 +1007,7 @@
         function showToast(message, type = 'info') {
             const container = document.getElementById('toastContainer');
             const toast = document.createElement('div');
-            
+
             const bg = type === 'success' ? 'bg-emerald-600' : type === 'error' ? 'bg-rose-600' : 'bg-slate-800';
             toast.className = `${bg} text-white px-4 py-2.5 rounded-xl shadow-lg text-xs font-semibold flex items-center gap-2 animate-fade-in pointer-events-auto`;
             toast.innerHTML = `<i class="fa-solid fa-circle-info"></i> <span>${message}</span>`;
