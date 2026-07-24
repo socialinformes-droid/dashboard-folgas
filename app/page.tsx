@@ -471,53 +471,32 @@ export default function Home() {
                     if (!row.c || !row.c[colIdx]) return '';
                     const cell = row.c[colIdx];
                     if (!cell) return '';
-                    return cell.v !== null && cell.v !== undefined ? String(cell.v) : (cell.f || '');
+                    const value = cell.v !== null && cell.v !== undefined ? String(cell.v) : (cell.f || '');
+                    return value;
                 };
 
                 let item = { id: String(idx + 1) };
-                let dataInicioCol = -1, dataFimCol = -1;
 
-                // Primeiro passe: identificar posições das colunas
-                headers.forEach((h, colIndex) => {
-                    if ((h.includes('início') || h.includes('inicio')) && (h.includes('data') || h.includes('de')))
-                        dataInicioCol = colIndex;
-                    else if ((h.includes('término') || h.includes('fim') || h.includes('até') || h.includes('ate')) && h.includes('data'))
-                        dataFimCol = colIndex;
-                });
+                // Mapear colunas manualmente pela posição
+                if (row.c[1]) item.nome = getVal(1);  // Col B: Nome
+                if (row.c[2]) item.departamento = getVal(2);  // Col C: Área
+                if (row.c[3]) item.tipo = getVal(3);  // Col D: Tipo
+                if (row.c[5]) item.dataInicio = formatDateStr(getVal(5));  // Col F: Data Início
+                if (row.c[6]) item.dataFim = formatDateStr(getVal(6));  // Col G: Data Fim
+                if (row.c[7]) item.status = getVal(7);  // Col H: Status (ou Aprovado?)
 
-                // Segundo passe: mapear dados
-                headers.forEach((h, colIndex) => {
-                    const val = String(getVal(colIndex)).trim();
-                    if (!val || val === 'null') return;
-
-                    if (h.includes('nome') || h.includes('colaborador') || h.includes('pessoa'))
-                        item.nome = val;
-                    else if (h.includes('área') || h.includes('area') || h.includes('departamento') || h.includes('setor'))
-                        item.departamento = val;
-                    else if (h.includes('tipo') || h.includes('informe') || h.includes('motivo'))
-                        item.tipo = val;
-                    else if (colIndex === dataInicioCol)
-                        item.dataInicio = formatDateStr(val);
-                    else if (colIndex === dataFimCol)
-                        item.dataFim = formatDateStr(val);
-                    else if (h.includes('status') || h.includes('situação') || h.includes('situacao'))
-                        item.status = val;
-                    else if (h.includes('obs') || h.includes('nota') || h.includes('comentário') || h.includes('comentario'))
-                        item.obs = val;
-                });
-
-                // Se não tem dataFim, usa dataInicio (folga de um dia)
+                // Se não tem dataFim, usa dataInicio
                 if (item.dataInicio && !item.dataFim) {
                     item.dataFim = item.dataInicio;
                 }
 
-                item.nome = item.nome || \`Colaborador \${idx+1}\`;
-                item.departamento = item.departamento || 'Geral';
-                item.tipo = item.tipo || 'Folga Escala';
+                item.nome = (item.nome || '').trim() || \`Colaborador \${idx+1}\`;
+                item.departamento = (item.departamento || '').trim() || 'Geral';
+                item.tipo = (item.tipo || '').trim() || 'Folga';
                 item.dataInicio = item.dataInicio || '2026-07-01';
                 item.dataFim = item.dataFim || item.dataInicio;
-                item.status = item.status || 'Aprovado';
-                item.obs = item.obs || '';
+                item.status = (item.status || '').trim() || 'Aprovado';
+                item.obs = (item.obs || '').trim() || '';
 
                 return item;
             });
