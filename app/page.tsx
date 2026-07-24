@@ -23,14 +23,21 @@ export default function Home() {
         body { font-family: 'Inter', sans-serif; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: #f1f5f9; }
-        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
-        ::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        ::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #64748b; }
         .gantt-cell { min-width: 38px; max-width: 38px; }
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(4px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .animate-fade-in { animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1) forwards; }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .animate-spin { animation: spin 1s linear infinite; }
+        p { color: #334155; }
+        h2, h3, h4 { color: #1e293b; }
     </style>
 </head>
 <body class="h-full flex flex-col text-slate-800 antialiased selection:bg-blue-500 selection:text-white">
@@ -102,6 +109,10 @@ export default function Home() {
                     <button onclick="resetToCurrentMonth()" class="px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition">
                         Hoje
                     </button>
+                    <button onclick="refreshData()" id="refreshBtn" class="px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition flex items-center gap-1.5">
+                        <i class="fa-solid fa-rotate-right text-xs"><\/i>
+                        <span>Atualizar</span>
+                    </button>
                 </div>
             </div>
 
@@ -152,9 +163,9 @@ export default function Home() {
             <!-- Total Folgas Card -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
                 <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Total Registros</p>
-                    <h3 class="text-2xl font-bold text-slate-900 mt-0.5" id="kpiTotal">0</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5" id="kpiTotalSub">no período visualizado</p>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Total Registros</p>
+                    <h3 class="text-3xl font-bold text-slate-900 mt-0.5" id="kpiTotal">0</h3>
+                    <p class="text-[11px] text-slate-600 mt-0.5" id="kpiTotalSub">no período visualizado</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-blue-50 text-blue-600 flex items-center justify-center text-base font-bold">
                     <i class="fa-solid fa-umbrella-beach"><\/i>
@@ -164,9 +175,9 @@ export default function Home() {
             <!-- Ausentes Hoje Card -->
             <div class="bg-white p-4 rounded-2xl border border-slate-200/80 shadow-xs flex items-center justify-between">
                 <div>
-                    <p class="text-[11px] font-bold text-slate-400 uppercase tracking-wider">Ausentes Hoje</p>
-                    <h3 class="text-2xl font-bold text-amber-600 mt-0.5" id="kpiTodayOff">0</h3>
-                    <p class="text-[11px] text-slate-400 mt-0.5">colaboradores de folga</p>
+                    <p class="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Ausentes Hoje</p>
+                    <h3 class="text-3xl font-bold text-amber-600 mt-0.5" id="kpiTodayOff">0</h3>
+                    <p class="text-[11px] text-slate-600 mt-0.5">colaboradores de folga</p>
                 </div>
                 <div class="w-11 h-11 rounded-xl bg-amber-50 text-amber-600 flex items-center justify-center text-base font-bold">
                     <i class="fa-solid fa-user-clock"><\/i>
@@ -364,6 +375,17 @@ export default function Home() {
         window.addEventListener('load', () => {
             fetchSheetData();
         });
+
+        function refreshData() {
+            const btn = document.getElementById('refreshBtn');
+            btn.disabled = true;
+            btn.innerHTML = '<i class="fa-solid fa-spinner text-xs animate-spin"><\/i> <span>Atualizando...</span>';
+            fetchSheetData();
+            setTimeout(() => {
+                btn.disabled = false;
+                btn.innerHTML = '<i class="fa-solid fa-rotate-right text-xs"><\/i> <span>Atualizar</span>';
+            }, 2000);
+        }
 
         async function fetchSheetData() {
             const gvizUrl = \`https://docs.google.com/spreadsheets/d/\${SHEET_ID}/gviz/tq?tqx=out:json\`;
