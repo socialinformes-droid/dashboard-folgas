@@ -533,11 +533,14 @@ export default function Home() {
             if (!val) return '2026-07-01';
             let str = String(val).trim();
             if (str.includes('Date(')) {
-                const parts = str.match(/\\d+/g);
-                if (parts && parts.length >= 3) {
-                    const y = parts[0];
-                    const m = String(parseInt(parts[1]) + 1).padStart(2, '0');
-                    const d = String(parts[2]).padStart(2, '0');
+                // Extract numbers from Date(2026,6,20) format
+                const dateRegex = /Date\\((\\d+),(\\d+),(\\d+)/;
+                const match = str.match(dateRegex);
+                if (match && match.length >= 4) {
+                    const y = match[1];
+                    const m = String(parseInt(match[2]) + 1).padStart(2, '0');
+                    const d = String(match[3]).padStart(2, '0');
+                    console.log('Parsed date:', str, '→', \`\${y}-\${m}-\${d}\`);
                     return \`\${y}-\${m}-\${d}\`;
                 }
             }
