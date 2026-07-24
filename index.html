@@ -754,6 +754,17 @@
             }
             html += `</div></div>`;
 
+            const colorMap = {
+                'Folga Escala': 'bg-blue-600 hover:bg-blue-700',
+                'Férias': 'bg-emerald-600 hover:bg-emerald-700',
+                'Banco de Horas': 'bg-purple-600 hover:bg-purple-700',
+                'Folga Aniversário': 'bg-amber-600 hover:bg-amber-700',
+                'Atestado': 'bg-rose-600 hover:bg-rose-700'
+            };
+
+            const monthStartStr = `${year}-${String(month+1).padStart(2,'0')}-01`;
+            const monthEndStr = `${year}-${String(month+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+
             // Employee Timeline Rows
             employees.forEach(emp => {
                 const empRecords = filteredRecords.filter(r => r.nome === emp);
@@ -764,36 +775,36 @@
                             <span class="font-bold text-slate-900 truncate">${emp}</span>
                             <span class="text-[10px] text-slate-600 truncate">${dept}</span>
                          </div>`;
-                html += `<div class="flex-1 flex relative items-center py-2">`;
+                html += `<div class="flex-1 flex relative" style="min-height: 48px;">`;
 
+                // Células de fundo (grid + fim de semana)
                 for (let d = 1; d <= daysInMonth; d++) {
-                    const dayStr = `${year}-${String(month+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
-                    const activeLeave = empRecords.find(r => isDateInRange(dayStr, r.dataInicio, r.dataFim));
                     const isWeekend = new Date(year, month, d).getDay() % 6 === 0;
-
-                    let bgClass = isWeekend ? 'bg-slate-50/60' : '';
-                    let badgeHtml = '';
-
-                    if (activeLeave) {
-                        const colorMap = {
-                            'Folga Escala': 'bg-blue-600 text-white hover:bg-blue-700',
-                            'Férias': 'bg-emerald-600 text-white hover:bg-emerald-700',
-                            'Banco de Horas': 'bg-purple-600 text-white hover:bg-purple-700',
-                            'Folga Aniversário': 'bg-amber-600 text-white hover:bg-amber-700',
-                            'Atestado': 'bg-rose-600 text-white hover:bg-rose-700'
-                        };
-                        const bgBadge = colorMap[activeLeave.tipo] || 'bg-slate-700 text-white hover:bg-slate-800';
-
-                        badgeHtml = `<div title="${activeLeave.tipo}: ${dateToComparable(activeLeave.dataInicio).split('-').reverse().join('/')} até ${dateToComparable(activeLeave.dataFim).split('-').reverse().join('/')} (${activeLeave.status})"
-                                          class="w-full h-8 rounded-md ${bgBadge} flex items-center justify-center text-[10px] font-bold shadow-sm transition cursor-pointer">
-                                        ${activeLeave.tipo.substring(0, 3)}
-                                     </div>`;
-                    }
-
-                    html += `<div class="flex-1 px-1 border-r border-slate-200 h-full flex items-center justify-center ${bgClass}">
-                                ${badgeHtml}
-                             </div>`;
+                    html += `<div class="flex-1 border-r border-slate-200 h-full ${isWeekend ? 'bg-slate-50/60' : ''}"></div>`;
                 }
+
+                // Uma barra única por período de folga (dias consecutivos agrupados)
+                empRecords.forEach(r => {
+                    const startStr = dateToComparable(r.dataInicio);
+                    const endStr = dateToComparable(r.dataFim);
+
+                    if (endStr < monthStartStr || startStr > monthEndStr) return;
+
+                    const clippedStart = startStr < monthStartStr ? 1 : parseInt(startStr.split('-')[2], 10);
+                    const clippedEnd = endStr > monthEndStr ? daysInMonth : parseInt(endStr.split('-')[2], 10);
+                    const spanDays = clippedEnd - clippedStart + 1;
+
+                    const leftPct = ((clippedStart - 1) / daysInMonth) * 100;
+                    const widthPct = (spanDays / daysInMonth) * 100;
+                    const bgBadge = colorMap[r.tipo] || 'bg-slate-700 hover:bg-slate-800';
+                    const label = spanDays >= 3 ? r.tipo : r.tipo.substring(0, 3);
+
+                    html += `<div title="${r.tipo}: ${startStr.split('-').reverse().join('/')} até ${endStr.split('-').reverse().join('/')} (${r.status})"
+                                  class="absolute top-1/2 -translate-y-1/2 h-8 rounded-md ${bgBadge} text-white flex items-center justify-center text-[10px] font-bold shadow-sm transition cursor-pointer px-1.5 truncate"
+                                  style="left: calc(${leftPct}% + 2px); width: calc(${widthPct}% - 4px);">
+                                ${label}
+                             </div>`;
+                });
 
                 html += `</div></div>`;
             });
