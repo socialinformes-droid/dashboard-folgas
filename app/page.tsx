@@ -463,8 +463,13 @@ export default function Home() {
         }
 
         function parseGvizRows(table) {
-            if (!table || !table.cols || !table.rows) return [];
+            if (!table || !table.cols || !table.rows) {
+                console.log('Table structure invalid:', { hasCols: !!table?.cols, hasRows: !!table?.rows });
+                return [];
+            }
             const headers = table.cols.map(c => c ? (c.label || '').toLowerCase().trim() : '');
+            console.log('Headers:', headers);
+            console.log('Rows count:', table.rows.length);
 
             return table.rows.map((row, idx) => {
                 const getVal = (colIdx) => {
@@ -478,25 +483,33 @@ export default function Home() {
                 let item = { id: String(idx + 1) };
 
                 // Mapear colunas manualmente pela posição
-                if (row.c[1]) item.nome = getVal(1);  // Col B: Nome
-                if (row.c[2]) item.departamento = getVal(2);  // Col C: Área
-                if (row.c[3]) item.tipo = getVal(3);  // Col D: Tipo
-                if (row.c[5]) item.dataInicio = formatDateStr(getVal(5));  // Col F: Data Início
-                if (row.c[6]) item.dataFim = formatDateStr(getVal(6));  // Col G: Data Fim
-                if (row.c[7]) item.status = getVal(7);  // Col H: Status (ou Aprovado?)
+                item.nome = getVal(1);  // Col B: Nome
+                item.departamento = getVal(2);  // Col C: Área
+                item.tipo = getVal(3);  // Col D: Tipo
+                item.dataInicio = formatDateStr(getVal(5));  // Col F: Data Início
+                item.dataFim = formatDateStr(getVal(6));  // Col G: Data Fim
+                item.status = getVal(7);  // Col H: Aprovado por gestor?
+
+                console.log('Parsed row', idx, ':', item);
 
                 // Se não tem dataFim, usa dataInicio
                 if (item.dataInicio && !item.dataFim) {
                     item.dataFim = item.dataInicio;
                 }
 
-                item.nome = (item.nome || '').trim() || \`Colaborador \${idx+1}\`;
-                item.departamento = (item.departamento || '').trim() || 'Geral';
-                item.tipo = (item.tipo || '').trim() || 'Folga';
-                item.dataInicio = item.dataInicio || '2026-07-01';
-                item.dataFim = item.dataFim || item.dataInicio;
-                item.status = (item.status || '').trim() || 'Aprovado';
-                item.obs = (item.obs || '').trim() || '';
+                // Preencher defaults apenas se vazio
+                if (!item.nome) item.nome = \`Colaborador \${idx+1}\`;
+                if (!item.departamento) item.departamento = 'Geral';
+                if (!item.tipo) item.tipo = 'Folga';
+                if (!item.dataInicio) item.dataInicio = '2026-07-01';
+                if (!item.dataFim) item.dataFim = item.dataInicio;
+                if (!item.status) item.status = 'Aprovado';
+                if (!item.obs) item.obs = '';
+
+                item.nome = item.nome.trim();
+                item.departamento = item.departamento.trim();
+                item.tipo = item.tipo.trim();
+                item.status = item.status.trim();
 
                 return item;
             });
