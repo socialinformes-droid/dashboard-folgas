@@ -477,9 +477,9 @@ export default function Home() {
 
                 // Primeiro passe: identificar posições das colunas
                 headers.forEach((h, colIndex) => {
-                    if ((h.includes('início') || h.includes('inicio')) && h.includes('data') && h.includes('de'))
+                    if ((h.includes('início') || h.includes('inicio')) && (h.includes('data') || h.includes('de')))
                         dataInicioCol = colIndex;
-                    else if ((h.includes('fim') || h.includes('até') || h.includes('ate')) && h.includes('data'))
+                    else if ((h.includes('término') || h.includes('fim') || h.includes('até') || h.includes('ate')) && h.includes('data'))
                         dataFimCol = colIndex;
                 });
 
