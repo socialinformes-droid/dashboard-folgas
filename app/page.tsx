@@ -698,7 +698,7 @@ export default function Home() {
 
                 html += \`<div class="flex-1 text-center py-2 border-r border-slate-200 \${isWeekend ? 'bg-slate-100/70 text-slate-400' : ''}>
                             <div>\${d}</div>
-                            <div class="text-[9px] font-normal uppercase">\${\`DSTQQSS\`.split('')[dayOfWeek]}</div>
+                            <div class="text-[9px] font-normal uppercase">\${['D','S','T','Q','Q','S','S'][dayOfWeek]}</div>
                          </div>\`;
             }
             html += \`</div></div>\`;
