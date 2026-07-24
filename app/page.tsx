@@ -467,20 +467,36 @@ export default function Home() {
             return table.rows.map((row, idx) => {
                 const getVal = (colIdx) => {
                     if (!row.c || !row.c[colIdx]) return '';
-                    return row.c[colIdx].v !== null && row.c[colIdx].v !== undefined ? row.c[colIdx].v : (row.c[colIdx].f || '');
+                    const cell = row.c[colIdx];
+                    if (!cell) return '';
+                    return cell.v !== null && cell.v !== undefined ? String(cell.v) : (cell.f || '');
                 };
 
                 let item = { id: String(idx + 1) };
                 headers.forEach((h, colIndex) => {
-                    const val = getVal(colIndex);
-                    if (h.includes('colaborador') || h.includes('nome') || h.includes('pessoa')) item.nome = String(val);
-                    else if (h.includes('departamento') || h.includes('setor') || h.includes('área')) item.departamento = String(val);
-                    else if (h.includes('tipo') || h.includes('motivo')) item.tipo = String(val);
-                    else if (h.includes('início') || h.includes('inicio') || h.includes('de')) item.dataInicio = formatDateStr(val);
-                    else if (h.includes('fim') || h.includes('até') || h.includes('ate')) item.dataFim = formatDateStr(val);
-                    else if (h.includes('status') || h.includes('situação')) item.status = String(val);
-                    else if (h.includes('obs') || h.includes('nota') || h.includes('comentário')) item.obs = String(val);
+                    const val = String(getVal(colIndex)).trim();
+                    if (!val) return;
+
+                    if (h.includes('nome') || h.includes('colaborador') || h.includes('pessoa'))
+                        item.nome = val;
+                    else if (h.includes('área') || h.includes('area') || h.includes('departamento') || h.includes('setor'))
+                        item.departamento = val;
+                    else if (h.includes('tipo') || h.includes('informe') || h.includes('motivo'))
+                        item.tipo = val;
+                    else if ((h.includes('data') || h.includes('início') || h.includes('inicio') || h.includes('de')) && !h.includes('fim') && !h.includes('até'))
+                        item.dataInicio = formatDateStr(val);
+                    else if (h.includes('fim') || h.includes('até') || h.includes('ate') || (h.includes('data') && (h.includes('fim') || h.includes('até'))))
+                        item.dataFim = formatDateStr(val);
+                    else if (h.includes('status') || h.includes('situação') || h.includes('situacao'))
+                        item.status = val;
+                    else if (h.includes('obs') || h.includes('nota') || h.includes('comentário') || h.includes('comentario'))
+                        item.obs = val;
                 });
+
+                // Se não tem dataFim, usa dataInicio (folga de um dia)
+                if (item.dataInicio && !item.dataFim) {
+                    item.dataFim = item.dataInicio;
+                }
 
                 item.nome = item.nome || \`Colaborador \${idx+1}\`;
                 item.departamento = item.departamento || 'Geral';
