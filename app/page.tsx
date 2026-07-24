@@ -419,6 +419,7 @@ export default function Home() {
                     if (jsonMatch && jsonMatch[1]) {
                         const parsed = JSON.parse(jsonMatch[1]);
                         const records = parseGvizRows(parsed.table);
+                        console.log('Gviz parsed records:', records.length, records);
                         if (records.length > 0) {
                             leaveRecords = records;
                             initDashboard();
@@ -458,6 +459,7 @@ export default function Home() {
         function fallbackToSampleData() {
             leaveRecords = [...SAMPLE_DATA];
             initDashboard();
+            showToast('⚠️ Usando dados de exemplo. Verifique as permissões da Google Sheet.', 'info');
         }
 
         function parseGvizRows(table) {
