@@ -59,7 +59,7 @@ export default function Home() {
 
                 <!-- Actions -->
                 <div class="flex items-center gap-2 sm:gap-3">
-                    <a href="https://docs.google.com/forms" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 transition active:scale-95" title="Abrir formulário de solicitação de folga">
+                    <a href="https://forms.gle/dGinxqEvwbxCwUvW8" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-2 px-4 py-2 text-xs font-semibold rounded-xl text-white bg-blue-600 hover:bg-blue-700 shadow-sm shadow-blue-600/30 transition active:scale-95" title="Abrir formulário de solicitação de folga">
                         <i class="fa-solid fa-arrow-up-right-from-square text-xs"><\/i>
                         <span>Nova Folga (Formulário)</span>
                     </a>
