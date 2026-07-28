@@ -477,11 +477,19 @@
                 item.tipo = getVal(3);
 
                 // Tentar colunas F e G primeiro (Data início/fim); se vazias, usar E (Data de folga)
-                let dataInicio = formatDateStr(getVal(5));
-                let dataFim = formatDateStr(getVal(6));
+                const rawF = getVal(5);
+                const rawG = getVal(6);
+                const rawE = getVal(4);
+
+                let dataInicio = formatDateStr(rawF);
+                let dataFim = formatDateStr(rawG);
+
+                if (item.nome.includes('Felipe')) {
+                    console.log('DEBUG Felipe Pontes:', {rawE, rawF, rawG, dataInicio, dataFim});
+                }
 
                 if (!dataInicio || dataInicio === '2026-07-01') {
-                    const dataFolga = formatDateStr(getVal(4));
+                    const dataFolga = formatDateStr(rawE);
                     if (dataFolga && dataFolga !== '2026-07-01') {
                         dataInicio = dataFolga;
                         dataFim = dataFolga;
