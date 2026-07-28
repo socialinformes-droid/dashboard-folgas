@@ -484,10 +484,6 @@
                 let dataInicio = formatDateStr(rawF);
                 let dataFim = formatDateStr(rawG);
 
-                if (item.nome.includes('Felipe')) {
-                    console.log('DEBUG Felipe: rawE=' + rawE + ', rawF=' + rawF + ', rawG=' + rawG + ', dataInicio=' + dataInicio + ', dataFim=' + dataFim);
-                }
-
                 if (!dataInicio || dataInicio === '2026-07-01') {
                     const dataFolga = formatDateStr(rawE);
                     if (dataFolga && dataFolga !== '2026-07-01') {
@@ -559,10 +555,7 @@
                     const y = match[1];
                     const m = String(parseInt(match[2]) + 1).padStart(2, '0');
                     const d = String(match[3]).padStart(2, '0');
-                    console.log('Date regex matched:', {y, m, d, result: `${y}-${m}-${d}`});
                     return `${y}-${m}-${d}`;
-                } else {
-                    console.log('Date regex did NOT match:', str);
                 }
             }
             if (str.includes('/')) {
