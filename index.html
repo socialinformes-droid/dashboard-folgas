@@ -553,13 +553,16 @@
             if (!val) return '2026-07-01';
             let str = String(val).trim();
             if (str.includes('Date(')) {
-                const dateRegex = /Date\((\d+),(\d+),(\d+)/;
+                const dateRegex = /Date\((\d+),(\d+),(\d+)\)/;
                 const match = str.match(dateRegex);
                 if (match && match.length >= 4) {
                     const y = match[1];
                     const m = String(parseInt(match[2]) + 1).padStart(2, '0');
                     const d = String(match[3]).padStart(2, '0');
+                    console.log('Date regex matched:', {y, m, d, result: `${y}-${m}-${d}`});
                     return `${y}-${m}-${d}`;
+                } else {
+                    console.log('Date regex did NOT match:', str);
                 }
             }
             if (str.includes('/')) {
