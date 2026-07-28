@@ -475,8 +475,21 @@
                 item.nome = getVal(1);
                 item.departamento = getVal(2);
                 item.tipo = getVal(3);
-                item.dataInicio = formatDateStr(getVal(5));
-                item.dataFim = formatDateStr(getVal(6));
+
+                // Tentar colunas F e G primeiro (Data início/fim); se vazias, usar E (Data de folga)
+                let dataInicio = formatDateStr(getVal(5));
+                let dataFim = formatDateStr(getVal(6));
+
+                if (!dataInicio || dataInicio === '2026-07-01') {
+                    const dataFolga = formatDateStr(getVal(4));
+                    if (dataFolga && dataFolga !== '2026-07-01') {
+                        dataInicio = dataFolga;
+                        dataFim = dataFolga;
+                    }
+                }
+
+                item.dataInicio = dataInicio;
+                item.dataFim = dataFim;
                 item.status = getVal(7);
 
                 // Se não tem dataFim, usa dataInicio
@@ -532,7 +545,6 @@
             if (!val) return '2026-07-01';
             let str = String(val).trim();
             if (str.includes('Date(')) {
-                // Extract numbers from Date(2026,6,20) format
                 const dateRegex = /Date\((\d+),(\d+),(\d+)/;
                 const match = str.match(dateRegex);
                 if (match && match.length >= 4) {
@@ -543,9 +555,21 @@
                 }
             }
             if (str.includes('/')) {
-                const p = str.split('/');
-                if (p.length === 3 && p[2].length === 4) {
-                    return `${p[2]}-${p[1].padStart(2,'0')}-${p[0].padStart(2,'0')}`;
+                const parts = str.split('/');
+                if (parts.length === 3) {
+                    let day, month, year;
+                    if (parts[2].length === 4) {
+                        day = parts[0];
+                        month = parts[1];
+                        year = parts[2];
+                    } else if (parts[0].length === 4) {
+                        year = parts[0];
+                        month = parts[1];
+                        day = parts[2];
+                    } else {
+                        return str;
+                    }
+                    return `${year}-${month.padStart(2,'0')}-${day.padStart(2,'0')}`;
                 }
             }
             return str;
