@@ -72,6 +72,14 @@
 
                 <!-- View Tabs Switcher -->
                 <div class="flex items-center p-1 bg-slate-100/80 rounded-xl max-w-max border border-slate-200/50">
+                    <button onclick="switchView('dia')" id="btn-view-dia" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
+                        <i class="fa-regular fa-clock text-sm"></i>
+                        <span>Dia</span>
+                    </button>
+                    <button onclick="switchView('tresdias')" id="btn-view-tresdias" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition text-slate-600 hover:text-slate-900">
+                        <i class="fa-solid fa-calendar-week"></i>
+                        <span>3 Dias</span>
+                    </button>
                     <button onclick="switchView('timeline')" id="btn-view-timeline" class="view-btn flex items-center gap-2 px-3.5 py-1.5 rounded-lg text-xs font-semibold transition bg-white text-blue-600 shadow-xs">
                         <i class="fa-solid fa-chart-gantt"></i>
                         <span>Linha do Tempo</span>
@@ -92,16 +100,17 @@
 
                 <!-- Date Range Selector -->
                 <div class="flex items-center gap-2">
-                    <button onclick="navigateMonth(-1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition" title="Mês Anterior">
+                    <button onclick="navigatePeriod(-1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition" title="Período anterior">
                         <i class="fa-solid fa-chevron-left text-xs"></i>
                     </button>
-                    <div class="relative min-w-[160px] text-center">
+                    <div class="relative min-w-[190px] text-center">
                         <span id="currentPeriodLabel" class="text-sm font-bold text-slate-800">Carregando...</span>
+                        <span id="navStepHint" class="block text-[10px] text-slate-400 font-medium">Navegar por mês</span>
                     </div>
-                    <button onclick="navigateMonth(1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition" title="Próximo Mês">
+                    <button onclick="navigatePeriod(1)" class="p-2 text-slate-600 hover:bg-slate-100 rounded-lg border border-slate-200 transition" title="Próximo período">
                         <i class="fa-solid fa-chevron-right text-xs"></i>
                     </button>
-                    <button onclick="resetToCurrentMonth()" class="px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition">
+                    <button onclick="resetToToday()" class="px-2.5 py-1.5 text-xs font-medium text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg border border-slate-200 transition">
                         Hoje
                     </button>
                     <button onclick="refreshData()" id="refreshBtn" class="px-2.5 py-1.5 text-xs font-medium text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-lg border border-blue-200 transition flex items-center gap-1.5">
@@ -216,6 +225,23 @@
             </button>
         </div>
 
+        <!-- VIEW 0: Agenda de Dia / 3 Dias (inclui ausências com horário) -->
+        <div id="view-dia" class="view-panel hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4">
+                <h2 class="text-sm font-bold text-slate-900" id="agendaTitleDia">Ausências do Dia</h2>
+                <p class="text-xs text-slate-500">Quem está fora hoje, incluindo ausências temporárias e consultas médicas com horário</p>
+            </div>
+            <div id="agendaGridDia" class="grid grid-cols-1 gap-4"></div>
+        </div>
+
+        <div id="view-tresdias" class="view-panel hidden space-y-4">
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4">
+                <h2 class="text-sm font-bold text-slate-900" id="agendaTitleTresdias">Próximos 3 Dias</h2>
+                <p class="text-xs text-slate-500">Hoje e os dois dias seguintes, para antecipar cobertura de turno</p>
+            </div>
+            <div id="agendaGridTresdias" class="grid grid-cols-1 lg:grid-cols-3 gap-4"></div>
+        </div>
+
         <!-- VIEW 1: Timeline / Gantt Chart View -->
         <div id="view-timeline" class="view-panel bg-white rounded-2xl border border-slate-200/80 shadow-xs overflow-hidden">
             <div class="p-4 border-b border-slate-100 flex flex-wrap items-center justify-between gap-3">
@@ -226,9 +252,10 @@
                 <div class="flex flex-wrap items-center gap-3 text-xs">
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-blue-500"></span> Folga</span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-emerald-500"></span> Férias</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-cyan-500"></span> Ausência temporária</span>
+                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Consulta médica</span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-purple-500"></span> Banco</span>
                     <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-amber-500"></span> Aniversário</span>
-                    <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-sm bg-rose-500"></span> Atestado</span>
                 </div>
             </div>
 
@@ -308,7 +335,8 @@
                             <th class="py-3 px-4">Departamento</th>
                             <th class="py-3 px-4">Tipo</th>
                             <th class="py-3 px-4">Período</th>
-                            <th class="py-3 px-4">Dias</th>
+                            <th class="py-3 px-4">Horário</th>
+                            <th class="py-3 px-4">Duração</th>
                             <th class="py-3 px-4">Status</th>
                             <th class="py-3 px-4">Observações</th>
                         </tr>
@@ -357,10 +385,39 @@
         ];
 
         // State variables
+        const DEFAULT_DATE = '2026-07-01';
+        const AGENDA_VIEWS = { dia: 1, tresdias: 3 };   // views ancoradas em dias, não em mês
+        const AGENDA_START_HOUR = 7;                    // régua horária das ausências temporárias
+        const AGENDA_END_HOUR = 19;
+
         let leaveRecords = [];
         let filteredRecords = [];
         let currentDate = new Date(2026, 6, 1); // Default July 2026
+        let rangeAnchor = startOfToday();       // referência das views Dia / 3 Dias
         let activeView = 'timeline';
+
+        function startOfToday() {
+            const d = new Date();
+            d.setHours(0, 0, 0, 0);
+            return d;
+        }
+
+        function toDateKey(dateObj) {
+            const y = dateObj.getFullYear();
+            const m = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const d = String(dateObj.getDate()).padStart(2, '0');
+            return `${y}-${m}-${d}`;
+        }
+
+        function addDays(dateObj, delta) {
+            const d = new Date(dateObj);
+            d.setDate(d.getDate() + delta);
+            return d;
+        }
+
+        function isAgendaView(viewName) {
+            return Object.prototype.hasOwnProperty.call(AGENDA_VIEWS, viewName);
+        }
 
         // Chart instances
         let typeChartInstance = null;
@@ -402,6 +459,110 @@
             return day >= start && day <= end;
         }
 
+        // Normaliza horário vindo do Sheets: timeofday [13,0,0,0], "13:00:00",
+        // "Date(1899,11,30,13,0,0)" ou "13,0,0,0" -> "13:00". Vazio se não houver.
+        function formatTimeStr(val) {
+            if (val === null || val === undefined || val === '') return '';
+
+            if (Array.isArray(val)) {
+                if (val.length < 2) return '';
+                return `${String(val[0]).padStart(2,'0')}:${String(val[1]).padStart(2,'0')}`;
+            }
+
+            const str = String(val).trim();
+            if (!str) return '';
+
+            const dateSerial = str.match(/Date\(\d+,\d+,\d+,(\d+),(\d+)/);
+            if (dateSerial) return `${dateSerial[1].padStart(2,'0')}:${dateSerial[2].padStart(2,'0')}`;
+
+            const arrayish = str.match(/^(\d{1,2}),(\d{1,2}),\d/);
+            if (arrayish) return `${arrayish[1].padStart(2,'0')}:${arrayish[2].padStart(2,'0')}`;
+
+            const clock = str.match(/^(\d{1,2}):(\d{2})/);
+            if (clock) return `${clock[1].padStart(2,'0')}:${clock[2]}`;
+
+            return '';
+        }
+
+        // "13:00" -> 780 (minutos desde a meia-noite). -1 se inválido.
+        function timeToMinutes(timeStr) {
+            if (!timeStr) return -1;
+            const parts = String(timeStr).split(':');
+            if (parts.length < 2) return -1;
+            const h = parseInt(parts[0], 10);
+            const m = parseInt(parts[1], 10);
+            if (isNaN(h) || isNaN(m)) return -1;
+            return h * 60 + m;
+        }
+
+        // Rótulo curto do horário para badges e tooltips
+        function timeRangeLabel(record) {
+            if (!record.temHorario) return '';
+            return record.horaFim ? `${record.horaInicio} – ${record.horaFim}` : `a partir de ${record.horaInicio}`;
+        }
+
+        const hasValue = v => v !== null && v !== undefined && String(v).trim() !== '';
+
+        function escapeHtml(str) {
+            return String(str == null ? '' : str)
+                .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+                .replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        // Paleta única por tipo de ausência, usada no Gantt, nas agendas e na legenda.
+        const TYPE_STYLES = {
+            'Férias':              { bar: 'bg-emerald-600 hover:bg-emerald-700', chip: 'bg-emerald-50 text-emerald-700 border-emerald-200', dot: 'bg-emerald-500' },
+            'Folga (1 dia)':       { bar: 'bg-blue-600 hover:bg-blue-700',       chip: 'bg-blue-50 text-blue-700 border-blue-200',          dot: 'bg-blue-500' },
+            'Folga Escala':        { bar: 'bg-blue-600 hover:bg-blue-700',       chip: 'bg-blue-50 text-blue-700 border-blue-200',          dot: 'bg-blue-500' },
+            'Ausência temporária': { bar: 'bg-cyan-600 hover:bg-cyan-700',       chip: 'bg-cyan-50 text-cyan-700 border-cyan-200',          dot: 'bg-cyan-500' },
+            'Consulta médica':     { bar: 'bg-rose-600 hover:bg-rose-700',       chip: 'bg-rose-50 text-rose-700 border-rose-200',          dot: 'bg-rose-500' },
+            'Atestado':            { bar: 'bg-rose-600 hover:bg-rose-700',       chip: 'bg-rose-50 text-rose-700 border-rose-200',          dot: 'bg-rose-500' },
+            'Banco de Horas':      { bar: 'bg-purple-600 hover:bg-purple-700',   chip: 'bg-purple-50 text-purple-700 border-purple-200',    dot: 'bg-purple-500' },
+            'Folga Aniversário':   { bar: 'bg-amber-600 hover:bg-amber-700',     chip: 'bg-amber-50 text-amber-700 border-amber-200',       dot: 'bg-amber-500' }
+        };
+        const DEFAULT_TYPE_STYLE = { bar: 'bg-slate-700 hover:bg-slate-800', chip: 'bg-slate-100 text-slate-700 border-slate-200', dot: 'bg-slate-500' };
+
+        function typeStyle(tipo) {
+            return TYPE_STYLES[tipo] || DEFAULT_TYPE_STYLE;
+        }
+
+        // Monta o registro final a partir das colunas brutas, seja da origem gviz ou CSV.
+        // Três formatos de data convivem na planilha:
+        //   - período (Férias): Data de início + Data de término
+        //   - dia único (Folga / Ausência temporária): Data de folga
+        //   - com horário (Consulta médica): Data + Hora início/fim
+        function buildRecord(src, idx) {
+            const item = { id: String(idx + 1) };
+
+            item.nome = (hasValue(src.nome) ? String(src.nome).trim() : '') || `Colaborador ${idx+1}`;
+            item.departamento = (hasValue(src.departamento) ? String(src.departamento).trim() : '') || 'Geral';
+            item.tipo = (hasValue(src.tipo) ? String(src.tipo).trim() : '') || 'Folga';
+            item.status = (hasValue(src.status) ? String(src.status).trim() : '') || 'Aprovado';
+            item.obs = hasValue(src.obs) ? String(src.obs).trim() : '';
+
+            item.horaInicio = formatTimeStr(src.horaInicio);
+            item.horaFim = formatTimeStr(src.horaFim);
+            item.temHorario = Boolean(item.horaInicio);
+
+            let inicio = '';
+            let fim = '';
+
+            if (hasValue(src.dataHorario)) {
+                inicio = fim = formatDateStr(src.dataHorario);
+            } else if (hasValue(src.dataInicio)) {
+                inicio = formatDateStr(src.dataInicio);
+                fim = hasValue(src.dataFim) ? formatDateStr(src.dataFim) : inicio;
+            } else if (hasValue(src.dataUnica)) {
+                inicio = fim = formatDateStr(src.dataUnica);
+            }
+
+            item.dataInicio = inicio || DEFAULT_DATE;
+            item.dataFim = fim || item.dataInicio;
+            if (item.dataFim < item.dataInicio) item.dataFim = item.dataInicio;
+
+            return item;
+        }
+
         async function fetchSheetData() {
             const gvizUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/gviz/tq?tqx=out:json`;
             const csvUrl = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
@@ -430,10 +591,10 @@
                 if (res.ok) {
                     const csvText = await res.text();
                     Papa.parse(csvText, {
-                        header: true,
+                        header: false,
                         skipEmptyLines: true,
                         complete: function(results) {
-                            if (results.data && results.data.length > 0) {
+                            if (results.data && results.data.length > 1) {
                                 leaveRecords = parseCsvRows(results.data);
                                 initDashboard();
                             } else {
@@ -451,7 +612,7 @@
         }
 
         function fallbackToSampleData() {
-            leaveRecords = [...SAMPLE_DATA];
+            leaveRecords = SAMPLE_DATA.map(r => ({ horaInicio: '', horaFim: '', temHorario: false, ...r }));
             initDashboard();
             showToast('⚠️ Usando dados de exemplo. Verifique as permissões da Google Sheet.', 'info');
         }
@@ -459,94 +620,82 @@
         function parseGvizRows(table) {
             if (!table || !table.cols || !table.rows) return [];
 
+            // Posição fixa das colunas da planilha:
+            // A=Carimbo, B=Nome, C=Área, D=Tipo, E=Data de folga/Ausência temporária,
+            // F=Data início, G=Data fim, H=Aprovado, I=Hora início, J=Hora fim, K=Data (c/ horário)
             return table.rows.map((row, idx) => {
-                const getVal = (colIdx) => {
-                    if (!row.c || !row.c[colIdx]) return '';
+                const getRaw = (colIdx) => {
+                    if (!row.c || !row.c[colIdx]) return null;
                     const cell = row.c[colIdx];
-                    if (!cell) return '';
-                    const value = cell.v !== null && cell.v !== undefined ? String(cell.v) : (cell.f || '');
-                    return value;
+                    if (!cell) return null;
+                    return cell.v !== null && cell.v !== undefined ? cell.v : (cell.f || null);
                 };
 
-                let item = { id: String(idx + 1) };
-
-                // Mapear colunas pela posição fixa da planilha:
-                // A=Carimbo, B=Nome, C=Área, D=Tipo, E=Data de folga, F=Data início, G=Data fim, H=Aprovado
-                item.nome = getVal(1);
-                item.departamento = getVal(2);
-                item.tipo = getVal(3);
-
-                // Tentar colunas F e G primeiro (Data início/fim); se vazias, usar E (Data de folga)
-                const rawF = getVal(5);
-                const rawG = getVal(6);
-                const rawE = getVal(4);
-
-                let dataInicio = formatDateStr(rawF);
-                let dataFim = formatDateStr(rawG);
-
-                if (!dataInicio || dataInicio === '2026-07-01') {
-                    const dataFolga = formatDateStr(rawE);
-                    if (dataFolga && dataFolga !== '2026-07-01') {
-                        dataInicio = dataFolga;
-                        dataFim = dataFolga;
-                    }
-                }
-
-                item.dataInicio = dataInicio;
-                item.dataFim = dataFim;
-                item.status = getVal(7);
-
-                // Se não tem dataFim, usa dataInicio
-                if (item.dataInicio && !item.dataFim) {
-                    item.dataFim = item.dataInicio;
-                }
-
-                if (!item.nome) item.nome = `Colaborador ${idx+1}`;
-                if (!item.departamento) item.departamento = 'Geral';
-                if (!item.tipo) item.tipo = 'Folga';
-                if (!item.dataInicio) item.dataInicio = '2026-07-01';
-                if (!item.dataFim) item.dataFim = item.dataInicio;
-                if (!item.status) item.status = 'Aprovado';
-                if (!item.obs) item.obs = '';
-
-                item.nome = item.nome.trim();
-                item.departamento = item.departamento.trim();
-                item.tipo = item.tipo.trim();
-                item.status = item.status.trim();
-
-                return item;
+                return buildRecord({
+                    nome: getRaw(1),
+                    departamento: getRaw(2),
+                    tipo: getRaw(3),
+                    dataUnica: getRaw(4),
+                    dataInicio: getRaw(5),
+                    dataFim: getRaw(6),
+                    status: getRaw(7),
+                    horaInicio: getRaw(8),
+                    horaFim: getRaw(9),
+                    dataHorario: getRaw(10)
+                }, idx);
             });
+        }
+
+        // A planilha repete os cabeçalhos "Data de início (De)" / "Data de término (Até)":
+        // a 1ª ocorrência é o período em dias, a 2ª é o horário da ausência temporária.
+        // Por isso o CSV é lido por posição, e não por nome de coluna.
+        function buildColumnIndex(headers) {
+            const matchAll = (pred) => headers.map((h, i) => pred(h) ? i : -1).filter(i => i >= 0);
+            const inicios = matchAll(h => h.includes('início') || h.includes('inicio'));
+            const fins = matchAll(h => h.includes('término') || h.includes('termino') || h.includes('fim'));
+            const first = (arr, n) => arr.length > n ? arr[n] : -1;
+
+            return {
+                nome: headers.findIndex(h => h.includes('nome') || h.includes('colaborador')),
+                departamento: headers.findIndex(h => h.includes('área') || h.includes('area') || h.includes('setor') || h.includes('departamento')),
+                tipo: headers.findIndex(h => h.includes('tipo')),
+                dataUnica: headers.findIndex(h => h.includes('folga')),
+                dataInicio: first(inicios, 0),
+                dataFim: first(fins, 0),
+                status: headers.findIndex(h => h.includes('aprovado') || h.includes('status')),
+                horaInicio: first(inicios, 1),
+                horaFim: first(fins, 1),
+                dataHorario: headers.lastIndexOf('data'),
+                obs: headers.findIndex(h => h.includes('obs'))
+            };
         }
 
         function parseCsvRows(rows) {
-            return rows.map((r, idx) => {
-                const keys = Object.keys(r);
-                let item = { id: String(idx + 1) };
+            if (!rows || rows.length < 2) return [];
 
-                keys.forEach(k => {
-                    const lk = k.toLowerCase().trim();
-                    const val = r[k];
-                    if (lk.includes('colaborador') || lk.includes('nome')) item.nome = val;
-                    else if (lk.includes('área') || lk.includes('area') || lk.includes('departamento') || lk.includes('setor')) item.departamento = val;
-                    else if (lk.includes('tipo')) item.tipo = val;
-                    else if (lk.includes('término') || lk.includes('fim')) item.dataFim = formatDateStr(val);
-                    else if (lk.includes('início') || lk.includes('inicio')) item.dataInicio = formatDateStr(val);
-                    else if (lk.includes('status') || lk.includes('aprovado')) item.status = val;
-                    else if (lk.includes('obs')) item.obs = val;
-                });
+            const headers = rows[0].map(h => String(h || '').toLowerCase().trim());
+            const cols = buildColumnIndex(headers);
+            const pick = (row, colIdx) => colIdx >= 0 && colIdx < row.length ? row[colIdx] : '';
 
-                item.nome = item.nome || `Colaborador ${idx+1}`;
-                item.departamento = item.departamento || 'Geral';
-                item.tipo = item.tipo || 'Folga Escala';
-                item.dataInicio = item.dataInicio || '2026-07-01';
-                item.dataFim = item.dataFim || item.dataInicio;
-                item.status = item.status || 'Aprovado';
-                return item;
-            });
+            return rows.slice(1)
+                .filter(row => Array.isArray(row) && row.some(c => hasValue(c)))
+                .map((row, idx) => buildRecord({
+                    nome: pick(row, cols.nome),
+                    departamento: pick(row, cols.departamento),
+                    tipo: pick(row, cols.tipo),
+                    dataUnica: pick(row, cols.dataUnica),
+                    dataInicio: pick(row, cols.dataInicio),
+                    dataFim: pick(row, cols.dataFim),
+                    status: pick(row, cols.status),
+                    horaInicio: pick(row, cols.horaInicio),
+                    horaFim: pick(row, cols.horaFim),
+                    dataHorario: pick(row, cols.dataHorario),
+                    obs: pick(row, cols.obs)
+                }, idx));
         }
 
         function formatDateStr(val) {
-            if (!val) return '2026-07-01';
+            if (!val) return DEFAULT_DATE;
             let str = String(val).trim();
             if (str.includes('Date(')) {
                 const dateRegex = /Date\((\d+),(\d+),(\d+)\)/;
@@ -662,34 +811,67 @@
             const targetView = document.getElementById(`view-${viewName}`);
             if (targetView) targetView.classList.remove('hidden');
 
+            // O seletor de período muda de passo (dia x mês) conforme a view
+            updateHeaderPeriodLabel();
             renderActiveView();
         }
 
         function renderActiveView() {
-            if (activeView === 'timeline') renderGanttTimeline();
+            if (isAgendaView(activeView)) renderAgenda(activeView);
+            else if (activeView === 'timeline') renderGanttTimeline();
             else if (activeView === 'calendar') renderCalendar();
             else if (activeView === 'dashboard') renderCharts();
             else if (activeView === 'table') renderTable();
         }
 
-        function navigateMonth(delta) {
-            currentDate.setMonth(currentDate.getMonth() + delta);
+        // Nas views Dia / 3 Dias as setas andam de dia em dia; nas demais, de mês em mês.
+        function navigatePeriod(delta) {
+            if (isAgendaView(activeView)) {
+                rangeAnchor = addDays(rangeAnchor, delta);
+            } else {
+                currentDate.setMonth(currentDate.getMonth() + delta);
+            }
             updateHeaderPeriodLabel();
             renderActiveView();
             renderKPIs();
         }
 
-        function resetToCurrentMonth() {
+        function resetToToday() {
             currentDate = new Date();
+            rangeAnchor = startOfToday();
             updateHeaderPeriodLabel();
             renderActiveView();
             renderKPIs();
         }
 
         function updateHeaderPeriodLabel() {
+            const label = document.getElementById('currentPeriodLabel');
+            const navHint = document.getElementById('navStepHint');
+
+            if (isAgendaView(activeView)) {
+                const span = AGENDA_VIEWS[activeView];
+                const first = rangeAnchor;
+                const last = addDays(rangeAnchor, span - 1);
+                label.innerText = span === 1
+                    ? formatDayLabel(first)
+                    : `${formatDayLabel(first, true)} → ${formatDayLabel(last, true)}`;
+                if (navHint) navHint.innerText = span === 1 ? 'Navegar por dia' : 'Navegar por dia';
+                return;
+            }
+
             const months = ['Janeiro', 'Fevereiro', 'Março', 'Abril', 'Maio', 'Junho', 'Julho', 'Agosto', 'Setembro', 'Outubro', 'Novembro', 'Dezembro'];
-            const label = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
-            document.getElementById('currentPeriodLabel').innerText = label;
+            label.innerText = `${months[currentDate.getMonth()]} ${currentDate.getFullYear()}`;
+            if (navHint) navHint.innerText = 'Navegar por mês';
+        }
+
+        const WEEKDAY_NAMES = ['Domingo', 'Segunda', 'Terça', 'Quarta', 'Quinta', 'Sexta', 'Sábado'];
+        const WEEKDAY_SHORT = ['Dom', 'Seg', 'Ter', 'Qua', 'Qui', 'Sex', 'Sáb'];
+
+        function formatDayLabel(dateObj, short = false) {
+            const dd = String(dateObj.getDate()).padStart(2, '0');
+            const mm = String(dateObj.getMonth() + 1).padStart(2, '0');
+            const weekday = short ? WEEKDAY_SHORT[dateObj.getDay()] : WEEKDAY_NAMES[dateObj.getDay()];
+            return `${weekday}, ${dd}/${mm}`;
         }
 
         function renderKPIs() {
@@ -749,13 +931,23 @@
             const month = currentDate.getMonth();
             const daysInMonth = new Date(year, month + 1, 0).getDate();
 
-            const employees = [...new Set(filteredRecords.map(r => r.nome))].sort();
+            const monthStartStr = `${year}-${String(month+1).padStart(2,'0')}-01`;
+            const monthEndStr = `${year}-${String(month+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
+
+            // Só entram no gráfico os registros que cruzam o mês exibido
+            const monthRecords = filteredRecords.filter(r => {
+                const startStr = dateToComparable(r.dataInicio);
+                const endStr = dateToComparable(r.dataFim);
+                return startStr && endStr && endStr >= monthStartStr && startStr <= monthEndStr;
+            });
+
+            const employees = [...new Set(monthRecords.map(r => r.nome))].sort();
 
             if (employees.length === 0) {
                 container.innerHTML = `
                     <div class="p-12 text-center text-slate-400 text-xs space-y-2">
                         <i class="fa-solid fa-folder-open text-3xl text-slate-300"></i>
-                        <p>Nenhum registro encontrado para os filtros selecionados.</p>
+                        <p>Nenhuma ausência neste mês para os filtros selecionados.</p>
                     </div>`;
                 return;
             }
@@ -782,20 +974,9 @@
             }
             html += `</div></div>`;
 
-            const colorMap = {
-                'Folga Escala': 'bg-blue-600 hover:bg-blue-700',
-                'Férias': 'bg-emerald-600 hover:bg-emerald-700',
-                'Banco de Horas': 'bg-purple-600 hover:bg-purple-700',
-                'Folga Aniversário': 'bg-amber-600 hover:bg-amber-700',
-                'Atestado': 'bg-rose-600 hover:bg-rose-700'
-            };
-
-            const monthStartStr = `${year}-${String(month+1).padStart(2,'0')}-01`;
-            const monthEndStr = `${year}-${String(month+1).padStart(2,'0')}-${String(daysInMonth).padStart(2,'0')}`;
-
             // Employee Timeline Rows
             employees.forEach(emp => {
-                const empRecords = filteredRecords.filter(r => r.nome === emp);
+                const empRecords = monthRecords.filter(r => r.nome === emp);
                 const dept = empRecords[0]?.departamento || '';
 
                 html += `<div class="flex border-b border-slate-100 hover:bg-blue-50/50 transition text-xs">`;
@@ -824,13 +1005,23 @@
 
                     const leftPct = ((clippedStart - 1) / daysInMonth) * 100;
                     const widthPct = (spanDays / daysInMonth) * 100;
-                    const bgBadge = colorMap[r.tipo] || 'bg-slate-700 hover:bg-slate-800';
-                    const label = spanDays >= 3 ? r.tipo : r.tipo.substring(0, 3);
+                    const bgBadge = typeStyle(r.tipo).bar;
 
-                    html += `<div title="${r.tipo}: ${startStr.split('-').reverse().join('/')} até ${endStr.split('-').reverse().join('/')} (${r.status})"
+                    // Ausências com horário ocupam 1 dia: o rótulo mostra a hora, não o tipo
+                    const horario = timeRangeLabel(r);
+                    const label = r.temHorario
+                        ? r.horaInicio
+                        : (spanDays >= 3 ? r.tipo : r.tipo.substring(0, 3));
+
+                    const periodo = startStr === endStr
+                        ? startStr.split('-').reverse().join('/')
+                        : `${startStr.split('-').reverse().join('/')} até ${endStr.split('-').reverse().join('/')}`;
+                    const tooltip = `${r.tipo}: ${periodo}${horario ? ` • ${horario}` : ''} (${r.status})`;
+
+                    html += `<div title="${escapeHtml(tooltip)}"
                                   class="absolute top-1/2 -translate-y-1/2 h-8 rounded-md ${bgBadge} text-white flex items-center justify-center text-[10px] font-bold shadow-sm transition cursor-pointer px-1.5 truncate"
                                   style="left: calc(${leftPct}% + 2px); width: calc(${widthPct}% - 4px);">
-                                ${label}
+                                ${escapeHtml(label)}
                              </div>`;
                 });
 
@@ -839,6 +1030,125 @@
 
             html += `</div>`;
             container.innerHTML = html;
+        }
+
+        // Agenda de N dias a partir de rangeAnchor. Separa quem está fora o dia inteiro
+        // de quem tem ausência com horário (ausência temporária / consulta médica).
+        function renderAgenda(viewName) {
+            const span = AGENDA_VIEWS[viewName];
+            const grid = document.getElementById(`agendaGrid${viewName.charAt(0).toUpperCase()}${viewName.slice(1)}`);
+            if (!grid) return;
+
+            const todayKey = toDateKey(startOfToday());
+            let html = '';
+
+            for (let i = 0; i < span; i++) {
+                const dayObj = addDays(rangeAnchor, i);
+                const dayKey = toDateKey(dayObj);
+                const isToday = dayKey === todayKey;
+
+                const dayRecords = filteredRecords.filter(r => isDateInRange(dayKey, r.dataInicio, r.dataFim));
+                const timed = dayRecords.filter(r => r.temHorario)
+                    .sort((a, b) => timeToMinutes(a.horaInicio) - timeToMinutes(b.horaInicio));
+                const allDay = dayRecords.filter(r => !r.temHorario)
+                    .sort((a, b) => a.nome.localeCompare(b.nome));
+
+                html += `<div class="bg-white rounded-2xl border ${isToday ? 'border-blue-300 ring-1 ring-blue-200' : 'border-slate-200/80'} shadow-xs overflow-hidden flex flex-col">`;
+
+                html += `<div class="px-4 py-3 border-b ${isToday ? 'border-blue-100 bg-blue-50/60' : 'border-slate-100 bg-slate-50/60'} flex items-center justify-between gap-2">
+                            <div class="flex items-center gap-2 min-w-0">
+                                ${isToday ? '<span class="px-1.5 py-0.5 rounded-md bg-blue-600 text-white text-[9px] font-bold uppercase tracking-wide shrink-0">Hoje</span>' : ''}
+                                <span class="text-xs font-bold text-slate-800 truncate">${escapeHtml(formatDayLabel(dayObj))}</span>
+                            </div>
+                            <span class="text-[10px] font-semibold ${dayRecords.length ? 'text-slate-600' : 'text-slate-400'} shrink-0">
+                                ${dayRecords.length === 0 ? 'sem ausências' : `${dayRecords.length} ausência${dayRecords.length > 1 ? 's' : ''}`}
+                            </span>
+                         </div>`;
+
+                html += `<div class="p-4 space-y-4 flex-1">`;
+
+                if (dayRecords.length === 0) {
+                    html += `<div class="py-8 text-center text-slate-400 text-xs space-y-2">
+                                <i class="fa-regular fa-circle-check text-2xl text-slate-300"></i>
+                                <p>Equipe completa neste dia.</p>
+                             </div>`;
+                }
+
+                if (allDay.length > 0) {
+                    html += `<div class="space-y-2">
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider">Dia inteiro (${allDay.length})</p>
+                                <div class="space-y-1.5">`;
+                    allDay.forEach(r => {
+                        const style = typeStyle(r.tipo);
+                        html += `<div class="flex items-center justify-between gap-2 p-2.5 rounded-xl border ${style.chip}">
+                                    <div class="min-w-0">
+                                        <p class="text-xs font-bold truncate">${escapeHtml(r.nome)}</p>
+                                        <p class="text-[10px] opacity-80 truncate">${escapeHtml(r.departamento)}</p>
+                                    </div>
+                                    <span class="text-[10px] font-semibold shrink-0">${escapeHtml(r.tipo)}</span>
+                                 </div>`;
+                    });
+                    html += `</div></div>`;
+                }
+
+                if (timed.length > 0) {
+                    html += `<div class="space-y-2">
+                                <p class="text-[10px] font-bold text-slate-500 uppercase tracking-wider flex items-center gap-1.5">
+                                    <i class="fa-regular fa-clock"></i> Com horário (${timed.length})
+                                </p>
+                                <div class="space-y-2">`;
+                    timed.forEach(r => {
+                        html += renderTimedCard(r);
+                    });
+                    html += `</div></div>`;
+                }
+
+                html += `</div></div>`;
+            }
+
+            grid.innerHTML = html;
+        }
+
+        // Cartão de ausência com horário, com a faixa posicionada numa régua de 07h às 19h.
+        function renderTimedCard(record) {
+            const style = typeStyle(record.tipo);
+            const rulerStart = AGENDA_START_HOUR * 60;
+            const rulerEnd = AGENDA_END_HOUR * 60;
+            const rulerSpan = rulerEnd - rulerStart;
+
+            const startMin = timeToMinutes(record.horaInicio);
+            const endMin = timeToMinutes(record.horaFim);
+            // Sem hora de término, assume 1h só para dar corpo visual à faixa
+            const effectiveEnd = endMin > startMin ? endMin : startMin + 60;
+
+            const clampedStart = Math.max(rulerStart, Math.min(startMin, rulerEnd));
+            const clampedEnd = Math.max(rulerStart, Math.min(effectiveEnd, rulerEnd));
+            const leftPct = ((clampedStart - rulerStart) / rulerSpan) * 100;
+            const widthPct = Math.max(((clampedEnd - clampedStart) / rulerSpan) * 100, 3);
+
+            const outOfRuler = startMin < rulerStart || startMin > rulerEnd;
+
+            return `<div class="p-3 rounded-xl border ${style.chip} space-y-2">
+                        <div class="flex items-start justify-between gap-2">
+                            <div class="min-w-0">
+                                <p class="text-xs font-bold truncate">${escapeHtml(record.nome)}</p>
+                                <p class="text-[10px] opacity-80 truncate">${escapeHtml(record.departamento)} • ${escapeHtml(record.tipo)}</p>
+                            </div>
+                            <span class="text-[11px] font-bold tabular-nums whitespace-nowrap shrink-0">${escapeHtml(timeRangeLabel(record))}</span>
+                        </div>
+                        <div>
+                            <div class="relative h-2 rounded-full bg-white/70 border border-current/10 overflow-hidden">
+                                <div class="absolute inset-y-0 rounded-full ${style.bar}"
+                                     style="left: ${leftPct.toFixed(2)}%; width: ${widthPct.toFixed(2)}%;"></div>
+                            </div>
+                            <div class="flex justify-between text-[9px] opacity-60 mt-1 tabular-nums">
+                                <span>${String(AGENDA_START_HOUR).padStart(2,'0')}h</span>
+                                <span>${String(Math.round((AGENDA_START_HOUR + AGENDA_END_HOUR) / 2)).padStart(2,'0')}h</span>
+                                <span>${String(AGENDA_END_HOUR).padStart(2,'0')}h</span>
+                            </div>
+                            ${outOfRuler ? '<p class="text-[9px] opacity-70 mt-0.5">Fora da faixa 07h–19h exibida</p>' : ''}
+                        </div>
+                     </div>`;
         }
 
         function renderCalendar() {
@@ -868,8 +1178,10 @@
                             <div class="mt-2 space-y-1">`;
 
                 dayLeaves.slice(0, 3).forEach(l => {
-                    html += `<div class="text-[10px] px-1.5 py-0.5 rounded bg-slate-100 text-slate-700 font-medium truncate" title="${l.nome} (${l.tipo})">
-                                ${l.nome.split(' ')[0]} - ${l.tipo}
+                    const horario = timeRangeLabel(l);
+                    const style = typeStyle(l.tipo);
+                    html += `<div class="text-[10px] px-1.5 py-0.5 rounded border ${style.chip} font-medium truncate" title="${escapeHtml(`${l.nome} — ${l.tipo}${horario ? ` (${horario})` : ''}`)}">
+                                ${escapeHtml(l.nome.split(' ')[0])} - ${escapeHtml(horario || l.tipo)}
                              </div>`;
                 });
 
@@ -895,13 +1207,22 @@
                 container.innerHTML = `<p class="text-xs text-slate-400 text-center py-6">Nenhum colaborador de folga nesta data.</p>`;
             } else {
                 let html = '';
-                list.forEach(item => {
-                    html += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center justify-between">
-                                <div>
-                                    <h4 class="text-xs font-bold text-slate-800">${item.nome}</h4>
-                                    <p class="text-[11px] text-slate-500">${item.departamento} • ${item.tipo}</p>
+                // Ausências com horário primeiro, em ordem cronológica
+                const ordered = [...list].sort((a, b) => {
+                    if (a.temHorario !== b.temHorario) return a.temHorario ? -1 : 1;
+                    if (a.temHorario) return timeToMinutes(a.horaInicio) - timeToMinutes(b.horaInicio);
+                    return a.nome.localeCompare(b.nome);
+                });
+
+                ordered.forEach(item => {
+                    const horario = timeRangeLabel(item);
+                    html += `<div class="p-3 bg-slate-50 rounded-xl border border-slate-200/60 flex items-center justify-between gap-2">
+                                <div class="min-w-0">
+                                    <h4 class="text-xs font-bold text-slate-800 truncate">${escapeHtml(item.nome)}</h4>
+                                    <p class="text-[11px] text-slate-500 truncate">${escapeHtml(item.departamento)} • ${escapeHtml(item.tipo)}</p>
+                                    ${horario ? `<p class="text-[11px] font-semibold text-slate-700 mt-0.5 tabular-nums"><i class="fa-regular fa-clock"></i> ${escapeHtml(horario)}</p>` : ''}
                                 </div>
-                                <span class="px-2 py-1 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700">${item.status}</span>
+                                <span class="px-2 py-1 text-[10px] font-semibold rounded-md bg-blue-100 text-blue-700 shrink-0">${escapeHtml(item.status)}</span>
                              </div>`;
                 });
                 container.innerHTML = html;
@@ -994,30 +1315,55 @@
             const tbody = document.getElementById('tableBody');
 
             if (filteredRecords.length === 0) {
-                tbody.innerHTML = `<tr><td colspan="7" class="text-center py-8 text-slate-400">Nenhum registro encontrado.</td></tr>`;
+                tbody.innerHTML = `<tr><td colspan="8" class="text-center py-8 text-slate-400">Nenhum registro encontrado.</td></tr>`;
                 return;
             }
 
             let html = '';
             filteredRecords.forEach(r => {
                 const days = calculateDays(r.dataInicio, r.dataFim);
+                const horario = timeRangeLabel(r);
+                const style = typeStyle(r.tipo);
+
+                const periodo = r.dataInicio === r.dataFim
+                    ? r.dataInicio.split('-').reverse().join('/')
+                    : `${r.dataInicio.split('-').reverse().join('/')} até ${r.dataFim.split('-').reverse().join('/')}`;
+
+                // Ausência com horário é medida em horas, não em dias
+                const duracao = r.temHorario
+                    ? formatDuration(r)
+                    : `${days} dia${days > 1 ? 's' : ''}`;
 
                 html += `<tr class="hover:bg-slate-50/80 transition">
-                    <td class="py-3 px-4 font-semibold text-slate-800">${r.nome}</td>
-                    <td class="py-3 px-4">${r.departamento}</td>
-                    <td class="py-3 px-4"><span class="px-2 py-1 rounded-md bg-slate-100 font-medium">${r.tipo}</span></td>
-                    <td class="py-3 px-4">${r.dataInicio.split('-').reverse().join('/')} até ${r.dataFim.split('-').reverse().join('/')}</td>
-                    <td class="py-3 px-4 font-bold text-slate-700">${days} dia${days>1?'s':''}</td>
+                    <td class="py-3 px-4 font-semibold text-slate-800">${escapeHtml(r.nome)}</td>
+                    <td class="py-3 px-4">${escapeHtml(r.departamento)}</td>
+                    <td class="py-3 px-4"><span class="px-2 py-1 rounded-md border font-medium ${style.chip}">${escapeHtml(r.tipo)}</span></td>
+                    <td class="py-3 px-4 tabular-nums">${escapeHtml(periodo)}</td>
+                    <td class="py-3 px-4 tabular-nums ${horario ? 'font-semibold text-slate-700' : 'text-slate-400'}">${escapeHtml(horario || '—')}</td>
+                    <td class="py-3 px-4 font-bold text-slate-700">${escapeHtml(duracao)}</td>
                     <td class="py-3 px-4">
                         <span class="px-2.5 py-1 rounded-full font-bold text-[10px] ${r.status==='Aprovado'?'bg-emerald-100 text-emerald-700':'bg-amber-100 text-amber-700'}">
-                            ${r.status}
+                            ${escapeHtml(r.status)}
                         </span>
                     </td>
-                    <td class="py-3 px-4 text-slate-500 max-w-xs truncate">${r.obs || '-'}</td>
+                    <td class="py-3 px-4 text-slate-500 max-w-xs truncate">${escapeHtml(r.obs || '-')}</td>
                 </tr>`;
             });
 
             tbody.innerHTML = html;
+        }
+
+        // Duração de uma ausência com horário, em h/min
+        function formatDuration(record) {
+            const start = timeToMinutes(record.horaInicio);
+            const end = timeToMinutes(record.horaFim);
+            if (start < 0 || end < 0 || end <= start) return 'parcial';
+
+            const total = end - start;
+            const h = Math.floor(total / 60);
+            const m = total % 60;
+            if (h === 0) return `${m}min`;
+            return m === 0 ? `${h}h` : `${h}h${String(m).padStart(2,'0')}`;
         }
 
         function calculateDays(start, end) {
@@ -1029,9 +1375,9 @@
         }
 
         function exportToCSV() {
-            let csv = 'Nome,Departamento,Tipo,DataInicio,DataFim,Status,Observacoes\n';
+            let csv = 'Nome,Departamento,Tipo,DataInicio,DataFim,HoraInicio,HoraFim,Status,Observacoes\n';
             filteredRecords.forEach(r => {
-                csv += `"${r.nome}","${r.departamento}","${r.tipo}","${r.dataInicio}","${r.dataFim}","${r.status}","${r.obs||''}"\n`;
+                csv += `"${r.nome}","${r.departamento}","${r.tipo}","${r.dataInicio}","${r.dataFim}","${r.horaInicio||''}","${r.horaFim||''}","${r.status}","${r.obs||''}"\n`;
             });
 
             const blob = new Blob([csv], { type: 'text/csv;charset=utf-8;' });
