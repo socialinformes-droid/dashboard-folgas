@@ -235,9 +235,17 @@
         </div>
 
         <div id="view-tresdias" class="view-panel hidden space-y-4">
-            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4">
-                <h2 class="text-sm font-bold text-slate-900" id="agendaTitleTresdias">Próximos 3 Dias</h2>
-                <p class="text-xs text-slate-500">Hoje e os dois dias seguintes, para antecipar cobertura de turno</p>
+            <div class="bg-white rounded-2xl border border-slate-200/80 shadow-xs p-4 space-y-3">
+                <div class="flex items-center justify-between gap-4 flex-wrap">
+                    <div>
+                        <h2 class="text-sm font-bold text-slate-900" id="agendaTitleTresdias">Próximos 3 Dias</h2>
+                        <p class="text-xs text-slate-500">Hoje e os dois dias seguintes, para antecipar cobertura de turno</p>
+                    </div>
+                    <label id="weekendToggleContainer" class="flex items-center gap-2.5 px-3 py-2 rounded-lg bg-slate-50 border border-slate-200 cursor-pointer hover:bg-slate-100 transition">
+                        <input type="checkbox" id="includeWeekendToggle" onchange="applyFilters()" class="w-4 h-4 cursor-pointer">
+                        <span class="text-xs font-medium text-slate-700 whitespace-nowrap">Incluir fim de semana</span>
+                    </label>
+                </div>
             </div>
             <div id="agendaGridTresdias" class="grid grid-cols-1 lg:grid-cols-3 gap-4"></div>
         </div>
@@ -395,6 +403,7 @@
         let currentDate = new Date(2026, 6, 1); // Default July 2026
         let rangeAnchor = startOfToday();       // referência das views Dia / 3 Dias
         let activeView = 'timeline';
+        let includeWeekend = false;             // Estado do toggle de fim de semana (padrão: false)
 
         function startOfToday() {
             const d = new Date();
@@ -770,6 +779,10 @@
             const dept = document.getElementById('departmentFilter').value;
             const type = document.getElementById('typeFilter').value;
             const status = document.getElementById('statusFilter').value;
+            const toggle = document.getElementById('includeWeekendToggle');
+            if (toggle) {
+                includeWeekend = toggle.checked;
+            }
 
             filteredRecords = leaveRecords.filter(r => {
                 const matchesSearch = (r.nome || '').toLowerCase().includes(search) ||
@@ -811,6 +824,18 @@
             const targetView = document.getElementById(`view-${viewName}`);
             if (targetView) targetView.classList.remove('hidden');
 
+            // Mostrar/esconder toggle de fim de semana baseado no dia da semana
+            const weekendToggleContainer = document.getElementById('weekendToggleContainer');
+            if (weekendToggleContainer) {
+                if (viewName === 'tresdias') {
+                    const dayOfWeek = rangeAnchor.getDay();
+                    const isThursdayOrFriday = dayOfWeek === 4 || dayOfWeek === 5; // 4=quinta, 5=sexta
+                    weekendToggleContainer.classList.toggle('hidden', !isThursdayOrFriday);
+                } else {
+                    weekendToggleContainer.classList.add('hidden');
+                }
+            }
+
             // O seletor de período muda de passo (dia x mês) conforme a view
             updateHeaderPeriodLabel();
             renderActiveView();
@@ -828,6 +853,9 @@
         function navigatePeriod(delta) {
             if (isAgendaView(activeView)) {
                 rangeAnchor = addDays(rangeAnchor, delta);
+                includeWeekend = false; // Reseta o toggle ao navegar
+                const toggle = document.getElementById('includeWeekendToggle');
+                if (toggle) toggle.checked = false;
             } else {
                 currentDate.setMonth(currentDate.getMonth() + delta);
             }
@@ -1039,11 +1067,63 @@
             const grid = document.getElementById(`agendaGrid${viewName.charAt(0).toUpperCase()}${viewName.slice(1)}`);
             if (!grid) return;
 
+            // Atualizar visibilidade do toggle baseado no dia da semana
+            if (viewName === 'tresdias') {
+                const weekendToggleContainer = document.getElementById('weekendToggleContainer');
+                if (weekendToggleContainer) {
+                    const dayOfWeek = rangeAnchor.getDay();
+                    const isThursdayOrFriday = dayOfWeek === 4 || dayOfWeek === 5; // 4=quinta, 5=sexta
+                    weekendToggleContainer.classList.toggle('hidden', !isThursdayOrFriday);
+                }
+            }
+
             const todayKey = toDateKey(startOfToday());
             let html = '';
 
-            for (let i = 0; i < span; i++) {
-                const dayObj = addDays(rangeAnchor, i);
+            // Para visualização de 3 dias: se não incluir FDS e estivermos em quinta/sexta,
+            // pula sábado/domingo e mostra 3 dias úteis
+            let daysToRender = [];
+            if (viewName === 'tresdias' && !includeWeekend) {
+                const startDayOfWeek = rangeAnchor.getDay();
+                const isThursdayOrFriday = startDayOfWeek === 4 || startDayOfWeek === 5;
+
+                if (isThursdayOrFriday) {
+                    // Quinta/sexta: pula para segunda-feira
+                    let currentDay = new Date(rangeAnchor);
+                    for (let i = 0; i < span; i++) {
+                        const dayOfWeek = currentDay.getDay();
+                        // Pula sábado (6) e domingo (0)
+                        if (dayOfWeek === 6) {
+                            currentDay.setDate(currentDay.getDate() + 2); // pula para segunda
+                        } else if (dayOfWeek === 0) {
+                            currentDay.setDate(currentDay.getDate() + 1); // pula para segunda
+                        }
+                        daysToRender.push(new Date(currentDay));
+                        currentDay.setDate(currentDay.getDate() + 1);
+                    }
+                } else {
+                    // Outros dias: mostra conforme normal, pulando FDS
+                    let currentDay = new Date(rangeAnchor);
+                    for (let i = 0; i < span; i++) {
+                        const dayOfWeek = currentDay.getDay();
+                        // Pula sábado (6) e domingo (0)
+                        if (dayOfWeek === 6) {
+                            currentDay.setDate(currentDay.getDate() + 2); // pula para segunda
+                        } else if (dayOfWeek === 0) {
+                            currentDay.setDate(currentDay.getDate() + 1); // pula para segunda
+                        }
+                        daysToRender.push(new Date(currentDay));
+                        currentDay.setDate(currentDay.getDate() + 1);
+                    }
+                }
+            } else {
+                // Modo normal: mostra N dias consecutivos
+                for (let i = 0; i < span; i++) {
+                    daysToRender.push(addDays(rangeAnchor, i));
+                }
+            }
+
+            daysToRender.forEach(dayObj => {
                 const dayKey = toDateKey(dayObj);
                 const isToday = dayKey === todayKey;
 
@@ -1104,7 +1184,7 @@
                 }
 
                 html += `</div></div>`;
-            }
+            });
 
             grid.innerHTML = html;
         }
