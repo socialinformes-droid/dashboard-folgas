@@ -969,6 +969,19 @@
                 return startStr && endStr && endStr >= monthStartStr && startStr <= monthEndStr;
             });
 
+            // Só entram como coluna os dias em que pelo menos um registro tem ausência —
+            // libera espaço horizontal pro texto das barras.
+            const activeDaysSet = new Set();
+            monthRecords.forEach(r => {
+                const startStr = dateToComparable(r.dataInicio);
+                const endStr = dateToComparable(r.dataFim);
+                const clippedStart = startStr < monthStartStr ? 1 : parseInt(startStr.split('-')[2], 10);
+                const clippedEnd = endStr > monthEndStr ? daysInMonth : parseInt(endStr.split('-')[2], 10);
+                for (let d = clippedStart; d <= clippedEnd; d++) activeDaysSet.add(d);
+            });
+            const activeDays = [...activeDaysSet].sort((a, b) => a - b);
+            const dayColumnIndex = new Map(activeDays.map((d, i) => [d, i]));
+
             const employees = [...new Set(monthRecords.map(r => r.nome))].sort();
 
             if (employees.length === 0) {
@@ -990,7 +1003,7 @@
                      </div>`;
             html += `<div class="flex-1 flex">`;
 
-            for (let d = 1; d <= daysInMonth; d++) {
+            activeDays.forEach(d => {
                 const dateObj = new Date(year, month, d);
                 const dayOfWeek = dateObj.getDay();
                 const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
@@ -999,7 +1012,7 @@
                             <div class="font-bold">${d}</div>
                             <div class="text-[9px] font-semibold uppercase">${['D','S','T','Q','Q','S','S'][dayOfWeek]}</div>
                          </div>`;
-            }
+            });
             html += `</div></div>`;
 
             // Employee Timeline Rows
@@ -1015,10 +1028,10 @@
                 html += `<div class="flex-1 flex relative" style="min-height: 48px;">`;
 
                 // Células de fundo (grid + fim de semana)
-                for (let d = 1; d <= daysInMonth; d++) {
+                activeDays.forEach(d => {
                     const isWeekend = new Date(year, month, d).getDay() % 6 === 0;
                     html += `<div class="flex-1 border-r border-slate-200 h-full ${isWeekend ? 'bg-slate-50/60' : ''}"></div>`;
-                }
+                });
 
                 // Uma barra única por período de folga (dias consecutivos agrupados)
                 empRecords.forEach(r => {
@@ -1031,8 +1044,10 @@
                     const clippedEnd = endStr > monthEndStr ? daysInMonth : parseInt(endStr.split('-')[2], 10);
                     const spanDays = clippedEnd - clippedStart + 1;
 
-                    const leftPct = ((clippedStart - 1) / daysInMonth) * 100;
-                    const widthPct = (spanDays / daysInMonth) * 100;
+                    const colStart = dayColumnIndex.get(clippedStart);
+                    const colEnd = dayColumnIndex.get(clippedEnd);
+                    const leftPct = (colStart / activeDays.length) * 100;
+                    const widthPct = ((colEnd - colStart + 1) / activeDays.length) * 100;
                     const bgBadge = typeStyle(r.tipo).bar;
 
                     // Ausências com horário ocupam 1 dia: o rótulo mostra a hora, não o tipo
@@ -1266,7 +1281,10 @@
                 });
 
                 if (dayLeaves.length > 3) {
-                    html += `<div class="text-[9px] text-slate-400 font-semibold text-center">+${dayLeaves.length - 3} mais</div>`;
+                    const extraNames = dayLeaves.slice(3)
+                        .map(l => `${l.nome} — ${l.tipo}`)
+                        .join('\n');
+                    html += `<div class="text-[9px] text-slate-400 font-semibold text-center" title="${escapeHtml(extraNames)}">+${dayLeaves.length - 3} mais</div>`;
                 }
 
                 html += `</div></div>`;
